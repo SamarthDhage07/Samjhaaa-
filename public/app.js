@@ -669,7 +669,290 @@ const LEGAL = {
 };
 function legal(k) { const [t, s] = LEGAL[k]; return topPub() + `<main id="main" class="wrap pg legal"><h1 style="font-size:2.4rem">${t}</h1>${s.map(([h, b]) => `<h2>${h}</h2><p>${b}</p>`).join('')}</main>` + footer(); }
 
-/* ---------- expansive interactive proximity radar ---------- */
+/* ---------- expansive interactive proximity radar & real indian map ---------- */
+let emergencyMapMode = 'india';
+
+function getNodeCoords(it) {
+  if (it.lat && it.lng) return { lat: it.lat, lng: it.lng };
+  if (it.donor && it.donor.lat && it.donor.lng) return { lat: it.donor.lat, lng: it.donor.lng };
+  if (it.r && it.r.lat && it.r.lng) return { lat: it.r.lat, lng: it.r.lng };
+  const u = S.users.find(x => x.name === it.name || x.id === it.id);
+  if (u && u.lat && u.lng) return { lat: u.lat, lng: u.lng };
+  if (it.name?.includes('Shree')) return { lat: 18.5362, lng: 73.8940 };
+  if (it.name?.includes('Annapurna')) return { lat: 18.5074, lng: 73.8077 };
+  if (it.name?.includes('Asha')) return { lat: 18.5089, lng: 73.9260 };
+  if (it.name?.includes('Seva')) return { lat: 18.5308, lng: 73.8475 };
+  if (it.name?.includes('Wakad')) return { lat: 18.5990, lng: 73.7600 };
+  return { lat: 18.5200, lng: 73.8550 };
+}
+
+function getCenterCoords(centerName) {
+  const u = S.users.find(x => x.name === centerName);
+  if (u && u.lat && u.lng) return { lat: u.lat, lng: u.lng };
+  if (centerName?.includes('Asha')) return { lat: 18.5089, lng: 73.9260 };
+  if (centerName?.includes('Shree')) return { lat: 18.5362, lng: 73.8940 };
+  if (centerName?.includes('Seva')) return { lat: 18.5308, lng: 73.8475 };
+  if (centerName?.includes('Wakad')) return { lat: 18.5990, lng: 73.7600 };
+  if (centerName?.includes('Annapurna')) return { lat: 18.5074, lng: 73.8077 };
+  return { lat: 18.5200, lng: 73.8550 };
+}
+
+function projectIndiaCoords(lat, lng) {
+  const minLat = 18.475, maxLat = 18.625;
+  const minLng = 73.730, maxLng = 73.965;
+  const padX = 75, padY = 65;
+  const w = 760 - padX * 2;
+  const h = 560 - padY * 2;
+  const x = padX + ((lng - minLng) / (maxLng - minLng)) * w;
+  const y = padY + (1 - (lat - minLat) / (maxLat - minLat)) * h;
+  return { x: Math.round(x), y: Math.round(y) };
+}
+
+function realIndiaCorridorMap(items, centerName, small) {
+  const W = 760, H = 560;
+  const cCoord = getCenterCoords(centerName);
+  const cPt = projectIndiaCoords(cCoord.lat, cCoord.lng);
+
+  // Selected item if any
+  const selItem = items.find(i => i.id === sel);
+  let activeRouteSvg = '';
+  if (selItem) {
+    const sCoord = getNodeCoords(selItem);
+    const sPt = projectIndiaCoords(sCoord.lat, sCoord.lng);
+    const midX = Math.round((cPt.x + sPt.x) / 2);
+    const midY = Math.round((cPt.y + sPt.y) / 2) - 20;
+    const pathD = `M ${cPt.x} ${cPt.y} Q ${midX} ${midY} ${sPt.x} ${sPt.y}`;
+    activeRouteSvg = `
+      <path id="indiaLiveTransitTrack" d="${pathD}" fill="none" stroke="#F59E0B" stroke-width="4" stroke-dasharray="8 6" filter="url(#indiaGlow)" stroke-linecap="round"/>
+      <g>
+        <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
+          <mpath href="#indiaLiveTransitTrack" />
+        </animateMotion>
+        <ellipse cx="0" cy="4" rx="6" ry="2.5" fill="rgba(0,0,0,0.8)" />
+        <rect x="-6" y="-5" width="12" height="9" rx="2" fill="#FF5722" stroke="#FFF" stroke-width="0.8" />
+        <circle cx="-3" cy="4" r="2" fill="#0F172A" />
+        <circle cx="3" cy="4" r="2" fill="#0F172A" />
+        <polygon points="6,-2 12,-4 12,2 6,0" fill="#FDE047" opacity="0.8" />
+      </g>
+      <g transform="translate(${midX}, ${midY - 14})">
+        <rect x="-42" y="-12" width="84" height="20" rx="5" fill="#0F172A" stroke="#F59E0B" stroke-width="1.2" />
+        <text y="2" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="8.5" fill="#FBBF24">${selItem.km} km &bull; ~${selItem.mins || Math.round(selItem.km * 3.5)} min</text>
+      </g>
+    `;
+  }
+
+  const facilityNodes = items.map(it => {
+    const coord = getNodeCoords(it);
+    const pt = projectIndiaCoords(coord.lat, coord.lng);
+    const isSel = sel === it.id;
+    const isGood = it.cls === 'green';
+    const isAmber = it.cls === 'amber';
+    const coreColor = isGood ? '#10B981' : (isAmber ? '#F59E0B' : '#EF4444');
+    const badgeW = Math.max(105, it.name.length * 6.8 + 24);
+
+    return `
+      <g class="india-map-node ${isSel ? 'sel' : ''}" ${small ? '' : `tabindex="0" role="button" data-sel="${it.id}"`} aria-label="${esc(it.name)}, ${it.km} km, ${it.qty} units">
+        <line x1="${cPt.x}" y1="${cPt.y}" x2="${pt.x}" y2="${pt.y}" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="3 4"/>
+        ${isSel ? `
+          <circle cx="${pt.x}" cy="${pt.y}" r="26" fill="none" stroke="#FBBF24" stroke-width="2" opacity="0.7">
+            <animate attributeName="r" values="14;34" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.9;0" dur="2.2s" repeatCount="indefinite"/>
+          </circle>
+        ` : ''}
+        <circle cx="${pt.x}" cy="${pt.y}" r="16" fill="${coreColor}" opacity="0.25" />
+        <circle cx="${pt.x}" cy="${pt.y}" r="8.5" fill="${coreColor}" stroke="#FFFFFF" stroke-width="2" class="node-pin-core" />
+        <circle cx="${pt.x}" cy="${pt.y}" r="3" fill="#0F172A" />
+        <g transform="translate(${pt.x}, ${pt.y + 16})">
+          <rect x="${-badgeW / 2}" y="0" width="${badgeW}" height="32" rx="6" fill="#0B132B" stroke="${isSel ? '#FBBF24' : coreColor}" stroke-width="${isSel ? '1.8' : '1'}" filter="url(#indiaGlow)"/>
+          <text x="0" y="13" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="9.5" fill="#F8FAFC">${esc(it.name)}</text>
+          <text x="0" y="24" text-anchor="middle" font-family="monospace" font-size="8" fill="#94A3B8">${coord.lat.toFixed(3)}°N, ${coord.lng.toFixed(3)}°E &bull; ${it.km}km</text>
+        </g>
+      </g>
+    `;
+  }).join('');
+
+  return `
+    <div class="india-map-container" role="region" aria-label="Real Indian Geographical Emergency Radar Map">
+      <div class="india-map-topbar">
+        <div class="india-map-title-row">
+          <div class="india-map-title">
+            <span style="font-size:1.15rem">🇮🇳</span>
+            <span>MAHARASHTRA DISPATCH CORRIDOR &bull; PUNE REGION</span>
+          </div>
+          <span class="india-map-badge">WGS84 Real GPS Datum</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-family:monospace;font-size:0.75rem;font-weight:700;color:#38BDF8">&bull; LIVE GPS SENSORS ACTIVE</span>
+        </div>
+      </div>
+
+      <svg viewBox="0 0 ${W} ${H}" class="india-map-svg" role="img" aria-label="Geographical map of Pune Maharashtra showing real relief facilities">
+        <defs>
+          <filter id="indiaGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#F59E0B" flood-opacity="0.4" />
+          </filter>
+          <filter id="waterGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#0284C7" flood-opacity="0.6" />
+          </filter>
+          <linearGradient id="mhGlowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF5722" />
+            <stop offset="100%" stop-color="#F59E0B" />
+          </linearGradient>
+          <pattern id="indiaGridPat" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.6" />
+          </pattern>
+        </defs>
+
+        <!-- Tactical Cartographic Base -->
+        <rect width="${W}" height="${H}" fill="#060C18" />
+        <rect width="${W}" height="${H}" fill="url(#indiaGridPat)" />
+
+        <!-- Geographical Latitude/Longitude Grid Lines -->
+        <g stroke="rgba(255,255,255,0.06)" stroke-width="0.8" stroke-dasharray="4 6">
+          <line x1="40" y1="126" x2="720" y2="126" />
+          <line x1="40" y1="272" x2="720" y2="272" />
+          <line x1="40" y1="419" x2="720" y2="419" />
+          <line x1="127" y1="30" x2="127" y2="530" />
+          <line x1="259" y1="30" x2="259" y2="530" />
+          <line x1="390" y1="30" x2="390" y2="530" />
+          <line x1="520" y1="30" x2="520" y2="530" />
+          <line x1="652" y1="30" x2="652" y2="530" />
+        </g>
+        <g font-family="monospace" font-size="7.5" fill="rgba(255,255,255,0.3)">
+          <text x="46" y="122">18.60°N</text>
+          <text x="46" y="268">18.55°N</text>
+          <text x="46" y="415">18.50°N</text>
+          <text x="130" y="525">73.75°E</text>
+          <text x="262" y="525">73.80°E</text>
+          <text x="393" y="525">73.85°E</text>
+          <text x="523" y="525">73.90°E</text>
+          <text x="655" y="525">73.95°E</text>
+        </g>
+
+        <!-- Real River System: Mula-Mutha Confluence -->
+        <!-- Pavana / Mula River (from North-West) -->
+        <path d="M 90 120 Q 180 160 250 230 T 385 330" fill="none" stroke="#0284C7" stroke-width="7" stroke-linecap="round" opacity="0.75" filter="url(#waterGlow)" />
+        <!-- Mutha River (from South-West / Khadakwasla) -->
+        <path d="M 140 500 Q 220 440 280 395 T 385 330" fill="none" stroke="#0284C7" stroke-width="7" stroke-linecap="round" opacity="0.75" filter="url(#waterGlow)" />
+        <!-- Confluence at Sangam and Mula-Mutha river flowing eastward -->
+        <path d="M 385 330 Q 450 315 520 325 T 730 365" fill="none" stroke="#0284C7" stroke-width="9" stroke-linecap="round" opacity="0.85" filter="url(#waterGlow)" />
+        <!-- River surface current wave -->
+        <path d="M 90 120 Q 180 160 250 230 T 385 330 Q 450 315 520 325 T 730 365" fill="none" stroke="#38BDF8" stroke-width="2" stroke-dasharray="14 18" class="india-water-wave" opacity="0.9" />
+        <text x="455" y="318" fill="#38BDF8" font-family="var(--fb)" font-size="8.5" font-weight="800" letter-spacing="1.2" opacity="0.85">~ MULA-MUTHA RIVER BASIN ~</text>
+
+        <!-- Real Highway Network -->
+        <!-- NH-48 (Mumbai-Pune-Bengaluru Expressway Bypass) -->
+        <path d="M 130 80 Q 170 170 220 280 T 265 410 Q 300 480 340 550" fill="none" stroke="#1E293B" stroke-width="11" stroke-linecap="round" />
+        <path d="M 130 80 Q 170 170 220 280 T 265 410 Q 300 480 340 550" fill="none" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="6 6" opacity="0.85" />
+        <g transform="translate(195, 240)">
+          <rect x="-18" y="-10" width="36" height="20" rx="4" fill="#0F172A" stroke="#F59E0B" stroke-width="1.2" />
+          <text y="4" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="9" fill="#FBBF24">NH 48</text>
+        </g>
+
+        <!-- NH-753F (Pune - Ahmednagar Road) -->
+        <path d="M 385 330 Q 460 295 540 265 T 730 215" fill="none" stroke="#1E293B" stroke-width="9" stroke-linecap="round" />
+        <path d="M 385 330 Q 460 295 540 265 T 730 215" fill="none" stroke="#F59E0B" stroke-width="1.4" stroke-dasharray="5 5" opacity="0.8" />
+        <g transform="translate(620, 235)">
+          <rect x="-22" y="-10" width="44" height="20" rx="4" fill="#0F172A" stroke="#F59E0B" stroke-width="1.2" />
+          <text y="4" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="8.5" fill="#FBBF24">NH 753F</text>
+        </g>
+
+        <!-- NH-65 (Pune - Solapur Highway) -->
+        <path d="M 350 425 Q 460 415 585 410 T 735 415" fill="none" stroke="#1E293B" stroke-width="9" stroke-linecap="round" />
+        <path d="M 350 425 Q 460 415 585 410 T 735 415" fill="none" stroke="#F59E0B" stroke-width="1.4" stroke-dasharray="5 5" opacity="0.8" />
+        <g transform="translate(660, 405)">
+          <rect x="-18" y="-10" width="36" height="20" rx="4" fill="#0F172A" stroke="#F59E0B" stroke-width="1.2" />
+          <text y="4" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="9" fill="#FBBF24">NH 65</text>
+        </g>
+
+        <!-- Primary Connecting City Arterials -->
+        <g stroke="#1E293B" stroke-width="5" stroke-dasharray="4 4" opacity="0.6">
+          <path d="M 265 410 L 385 330" />
+          <path d="M 385 330 L 510 325" />
+          <path d="M 510 325 L 585 410" />
+          <path d="M 149 136 L 260 230 L 385 330" />
+        </g>
+
+        <!-- Urban Sector Landmark Labels -->
+        <g font-family="var(--fb)" font-weight="800" font-size="8" fill="rgba(255,255,255,0.4)" letter-spacing="1">
+          <text x="100" y="105">WAKAD / HINJAWADI IT HUB</text>
+          <text x="220" y="215">AUNDH &bull; KHADKI</text>
+          <text x="210" y="445">KOTHRUD &bull; KARVE RD</text>
+          <text x="360" y="280">SHIVAJINAGAR &bull; METRO</text>
+          <text x="500" y="275">KOREGAON PARK</text>
+          <text x="600" y="445">HADAPSAR &bull; MAGARPATTA</text>
+          <text x="330" y="445">SWARGATE</text>
+        </g>
+
+        <!-- Official India National Silhouette Inset (Top Right) -->
+        <g class="india-national-inset" transform="translate(585, 20)">
+          <rect width="160" height="152" rx="8" fill="#0B132B" stroke="#F59E0B" stroke-opacity="0.45" stroke-width="1.2" filter="url(#indiaGlow)" />
+          <g transform="translate(10, 16)">
+            <text font-family="var(--fb)" font-weight="800" font-size="8.5" fill="#F8FAFC">🇮🇳 INDIA NATIONAL GRID</text>
+            <text y="9" font-family="monospace" font-size="6.8" fill="#94A3B8">SURVEY OF INDIA DATUM</text>
+          </g>
+          <!-- Vector Silhouette of Republic of India -->
+          <g transform="translate(10, 16) scale(0.92)">
+            <path d="M 52 16 C 50 14 47 18 45 20 C 41 24 38 29 34 34 C 30 38 27 42 24 46 C 20 50 17 56 16 62 C 15 67 19 70 23 68 C 27 67 29 72 27 76 C 26 80 23 84 21 88 C 19 93 21 98 24 104 C 28 110 33 117 38 123 C 42 127 45 131 47 136 C 49 132 52 127 55 122 C 59 117 64 110 68 103 C 72 96 76 91 81 86 C 85 82 91 79 95 76 C 99 73 102 69 100 65 C 98 62 94 61 90 62 C 87 58 85 53 86 49 C 90 47 98 45 105 43 C 112 41 119 41 123 45 C 126 49 123 54 120 58 C 114 62 109 65 104 68 C 100 71 98 75 102 77 C 106 79 113 77 118 75 C 122 71 126 66 127 60 C 125 55 121 50 116 46 C 109 40 98 36 87 34 C 80 32 73 26 68 21 C 64 17 58 14 52 16 Z" fill="#1E293B" stroke="#475569" stroke-width="1.2" />
+            <!-- Maharashtra / Western Corridor Highlight -->
+            <path d="M 23 86 C 27 80 33 78 40 77 C 47 76 54 80 59 86 C 63 90 61 96 56 99 C 50 102 43 103 38 106 C 31 108 25 101 23 95 Z" fill="url(#mhGlowGrad)" stroke="#F59E0B" stroke-width="1.2" />
+            <!-- Pune Regional Marker Dot & Pulse -->
+            <circle cx="38" cy="92" r="10" fill="none" stroke="#F59E0B" stroke-width="1.2">
+              <animate attributeName="r" values="3;12" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="38" cy="92" r="3.5" fill="#FF5722" stroke="#FFFFFF" stroke-width="1" />
+            <text x="46" y="94" font-family="var(--fb)" font-weight="800" font-size="7.5" fill="#FBBF24">&bull; PUNE</text>
+            <text x="46" y="103" font-family="monospace" font-size="6.5" fill="rgba(255,255,255,0.7)">18.5°N 73.8°E</text>
+          </g>
+        </g>
+
+        <!-- Cardinal Compass Rose (Bottom-Left) -->
+        <g transform="translate(60, 480)">
+          <circle cx="0" cy="0" r="22" fill="#0B132B" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+          <polygon points="0,-18 4,-4 18,0 4,4 0,18 -4,4 -18,0 -4,-4" fill="#1E293B" stroke="#F59E0B" stroke-width="0.8" />
+          <polygon points="0,-18 4,-4 0,0 -4,-4" fill="#FF5722" />
+          <text y="-22" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="8.5" fill="#FBBF24">N</text>
+          <text y="30" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.4)">18°31'N 73°51'E</text>
+        </g>
+
+        <!-- Distance Scale Bar -->
+        <g transform="translate(125, 498)">
+          <line x1="0" y1="0" x2="100" y2="0" stroke="#94A3B8" stroke-width="2" />
+          <line x1="0" y1="-4" x2="0" y2="4" stroke="#94A3B8" stroke-width="2" />
+          <line x1="50" y1="-3" x2="50" y2="3" stroke="#94A3B8" stroke-width="1.5" />
+          <line x1="100" y1="-4" x2="100" y2="4" stroke="#94A3B8" stroke-width="2" />
+          <text x="0" y="-7" font-family="monospace" font-size="7" fill="#94A3B8">0</text>
+          <text x="50" y="-7" text-anchor="middle" font-family="monospace" font-size="7" fill="#94A3B8">5 km</text>
+          <text x="100" y="-7" text-anchor="end" font-family="monospace" font-size="7" fill="#94A3B8">10 km</text>
+        </g>
+
+        <!-- Active Selected Route & Courier Transit Vector -->
+        ${activeRouteSvg}
+
+        <!-- Facility Nodes -->
+        ${facilityNodes}
+
+        <!-- Central Viewing HQ Anchor Pin -->
+        <g transform="translate(${cPt.x}, ${cPt.y})">
+          <circle cx="0" cy="0" r="30" fill="none" stroke="#FF5722" stroke-width="1.5" opacity="0.6" class="india-pulse-active" />
+          <circle cx="0" cy="0" r="14" fill="#C2571A" stroke="#FFFFFF" stroke-width="2.5" />
+          <circle cx="0" cy="0" r="5" fill="#FDE047" />
+          <g transform="translate(0, -22)">
+            <rect x="-65" y="-14" width="130" height="22" rx="5" fill="#0F172A" stroke="#FF5722" stroke-width="1.4" />
+            <text y="1" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="9" fill="#FFA56E">★ RADAR HQ: ${esc(centerName).slice(0, 14)}</text>
+          </g>
+        </g>
+      </svg>
+
+      <div class="india-map-footer-telemetry">
+        <div><span>STATE EMERGENCY GRID:</span> <b style="color:#FBBF24">MAHARASHTRA RELIEF VECTOR</b> &bull; PMRDA SECTOR 4</div>
+        <div><span>CORRIDOR CLEARANCE:</span> <b style="color:#10B981">NH-48 &bull; NH-65 &bull; NH-753F ACTIVE</b></div>
+      </div>
+    </div>
+  `;
+}
+
 function ring(items, center, small) {
   const W = 720, c = W / 2, max = Math.max(5, Math.ceil(Math.max(...items.map(i => i.km || 0), 1) / 5) * 5);
   const rings = [.25, .5, .75, 1].map(f => {
@@ -756,12 +1039,13 @@ function routeMap3D(fromName, toName, km, mins, ok) {
   const uid = ++routeMapCounter;
   const dist = km != null ? km : '2.4';
   const duration = mins != null ? mins : (Math.round(parseFloat(dist) * 3.5) || '8');
+  const p1 = getCenterCoords(fromName), p2 = getCenterCoords(toName);
   return `
     <div class="route-3d-stage">
       <div class="route-3d-box">
         <div class="route-3d-header">
-          <span>3D SATELLITE DISPATCH CORRIDOR</span>
-          <span class="route-3d-badge">Live Courier Path</span>
+          <span>🇮🇳 3D DISPATCH CORRIDOR &bull; PUNE REGION</span>
+          <span class="route-3d-badge">NH-48 EXPRESS TRANSIT</span>
         </div>
         <svg class="route-3d-svg" viewBox="0 0 460 210">
           <defs>
@@ -833,8 +1117,8 @@ function routeMap3D(fromName, toName, km, mins, ok) {
               <animate attributeName="opacity" values="0.9;0" dur="2s" repeatCount="indefinite" />
             </circle>
             <circle r="7" fill="#FF5722" stroke="#FFFFFF" stroke-width="2" />
-            <rect x="-42" y="-28" width="84" height="18" rx="4" fill="#0F172A" stroke="#FF5722" stroke-width="1" />
-            <text y="-16" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="8.5" fill="#FFA56E">PICKUP: ${esc(fromName).slice(0, 13)}</text>
+            <rect x="-44" y="-28" width="88" height="18" rx="4" fill="#0F172A" stroke="#FF5722" stroke-width="1" />
+            <text y="-16" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="8.2" fill="#FFA56E">PICKUP: ${esc(fromName).slice(0, 10)} (${p1.lat.toFixed(2)}°N)</text>
           </g>
 
           <!-- Receiver Pin (Destination) -->
@@ -845,8 +1129,8 @@ function routeMap3D(fromName, toName, km, mins, ok) {
               <animate attributeName="opacity" values="0.9;0" dur="2s" repeatCount="indefinite" />
             </circle>
             <circle r="7" fill="#10B981" stroke="#FFFFFF" stroke-width="2" />
-            <rect x="-44" y="-28" width="88" height="18" rx="4" fill="#0F172A" stroke="#10B981" stroke-width="1" />
-            <text y="-16" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="8.5" fill="#4ADE80">DROP-OFF: ${esc(toName).slice(0, 13)}</text>
+            <rect x="-46" y="-28" width="92" height="18" rx="4" fill="#0F172A" stroke="#10B981" stroke-width="1" />
+            <text y="-16" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="8.2" fill="#4ADE80">DROP-OFF: ${esc(toName).slice(0, 10)} (${p2.lat.toFixed(2)}°N)</text>
           </g>
 
           <!-- Animated Rider Scooter Following Path via SVG animateMotion -->
@@ -862,7 +1146,7 @@ function routeMap3D(fromName, toName, km, mins, ok) {
           </g>
 
           <!-- Telemetry Footer Overlay -->
-          <text x="14" y="198" font-family="monospace" font-size="8.5" fill="rgba(255,255,255,0.45)" letter-spacing="0.5">EST. TRANSIT: ~${duration} MIN &bull; ACTIVE CORRIDOR VECTOR &bull; DISPATCH READY</text>
+          <text x="14" y="198" font-family="monospace" font-size="8.5" fill="rgba(255,255,255,0.45)" letter-spacing="0.5">GPS: ${p1.lat.toFixed(3)}°N, ${p1.lng.toFixed(3)}°E ➔ ${p2.lat.toFixed(3)}°N, ${p2.lng.toFixed(3)}°E &bull; ~${duration} MIN DISPATCH</text>
         </svg>
         <div class="route-metric-pill-row" style="padding:0 14px">
           <div class="route-metric-pill"><span>Direct Distance:</span> <b class="accent" style="color:var(--orange)">${dist} km</b></div>
@@ -894,7 +1178,8 @@ function emergency() {
         ok: f.ok != null ? f.ok : true, 
         why: f.why || [], 
         need: Math.min(d.remaining, (receiverObj.needs || {})[d.category] || 30), 
-        cls: (f.ok !== false) ? (d.expiresAt - T() < 72e5 ? 'amber' : 'green') : 'bad' 
+        cls: (f.ok !== false) ? (d.expiresAt - T() < 72e5 ? 'amber' : 'green') : 'bad',
+        donor: dn
       };
     });
     const list = sortFilter(items);
@@ -907,8 +1192,16 @@ function emergency() {
             <span style="font-size:0.75rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange)">Live Corridor Telemetry</span>
             <div style="font-family:var(--fd);font-weight:700;font-size:1.25rem">${esc(receiverObj.name)} &bull; Nearby Donors Radar</div>
           </div>
+          <div class="india-mode-toggle-group">
+            <button class="india-mode-btn ${emergencyMapMode === 'india' ? 'active' : ''}" data-emergencymode="india">
+              <span>🇮🇳</span> Real Indian Map
+            </button>
+            <button class="india-mode-btn ${emergencyMapMode === 'radar' ? 'active' : ''}" data-emergencymode="radar">
+              <span>🎯</span> Polar Radar
+            </button>
+          </div>
           <div class="radar-hud-pills">
-            <span class="radar-hud-pill active">&bull; 360&deg; Live Radar Active</span>
+            <span class="radar-hud-pill active">&bull; Real-time Scanning</span>
             <span class="radar-hud-pill">${list.length} Donors In Range</span>
             <span class="radar-hud-pill" style="color:#6BCB77">&bull; ${list.filter(i => i.ok).length} Compatible</span>
             <span class="radar-hud-pill" style="color:#FFA56E">&bull; ${list.filter(i => i.cls === 'amber').length} Urgent</span>
@@ -919,7 +1212,7 @@ function emergency() {
         ${legendHtml}
 
         <div class="ringwrap">
-          ${list.length ? ring(list, receiverObj.name) : '<div class="card"><p class="mut">No donors match these filters in the immediate corridor.</p></div>'}
+          ${list.length ? (emergencyMapMode === 'india' ? realIndiaCorridorMap(list, receiverObj.name) : ring(list, receiverObj.name)) : '<div class="card"><p class="mut">No donors match these filters in the immediate corridor.</p></div>'}
           <div>
             ${cur ? detailR(cur) : `
               <div class="radar-inspect-hud">
@@ -951,7 +1244,7 @@ function emergency() {
   const d = mine.length ? (mine.find(x => x.id === sel2) || mine[0]) : (S.donations.find(x => x.status === 'Available') || S.donations[0] || { id: 'd1', category: 'Cooked meals', remaining: 45, unit: 'portions' });
   const items = S.users.filter(u => u.role === 'receiver').map(r => {
     const f = S.fits[(d?.id || '') + ':' + r.id] || {}, need = (r.needs || {})[d?.category || 'Cooked meals'] || 0;
-    return { id: r.id, name: r.name, km: f.km || 2.4, qty: need, cat: d?.category || 'Cooked meals', exp: d?.expiresAt || (T() + 72e5), ok: f.ok != null ? f.ok : true, why: f.why || [], r, cls: (f.ok !== false) ? 'green' : 'bad', demand: Object.values(r.needs || {}).reduce((a, b) => a + b, 0) };
+    return { id: r.id, name: r.name, km: f.km || 2.4, qty: need, cat: d?.category || 'Cooked meals', exp: d?.expiresAt || (T() + 72e5), ok: f.ok != null ? f.ok : true, why: f.why || [], r, cls: (f.ok !== false) ? 'green' : 'bad', demand: Object.values(r.needs || {}).reduce((a, b) => a + b, 0), receiver: r };
   });
   const list = sortFilter(items);
   const cur = list.find(i => i.id === sel) || list[0];
@@ -963,8 +1256,16 @@ function emergency() {
           <span style="font-size:0.75rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange)">Live Corridor Telemetry</span>
           <div style="font-family:var(--fd);font-weight:700;font-size:1.25rem">${esc(me.name)} &bull; Receiving Shelters Radar</div>
         </div>
+        <div class="india-mode-toggle-group">
+          <button class="india-mode-btn ${emergencyMapMode === 'india' ? 'active' : ''}" data-emergencymode="india">
+            <span>🇮🇳</span> Real Indian Map
+          </button>
+          <button class="india-mode-btn ${emergencyMapMode === 'radar' ? 'active' : ''}" data-emergencymode="radar">
+            <span>🎯</span> Polar Radar
+          </button>
+        </div>
         <div class="radar-hud-pills">
-          <span class="radar-hud-pill active">&bull; 360&deg; Radar Scanning</span>
+          <span class="radar-hud-pill active">&bull; Real-time Scanning</span>
           <span class="radar-hud-pill">${list.length} Shelters Monitored</span>
           <span class="radar-hud-pill" style="color:#6BCB77">&bull; ${list.filter(i => i.ok).length} Compatible</span>
         </div>
@@ -978,7 +1279,7 @@ function emergency() {
       ${legendHtml}
 
       <div class="ringwrap">
-        ${ring(list, S.me.name)}
+        ${emergencyMapMode === 'india' ? realIndiaCorridorMap(list, S.me.name) : ring(list, S.me.name)}
         <div>
           ${cur ? `
             <div class="radar-inspect-hud">
@@ -1384,6 +1685,7 @@ document.addEventListener('click', async e => {
     }
     return;
   }
+  const emm = e.target.closest('[data-emergencymode]'); if (emm) { emergencyMapMode = emm.dataset.emergencymode; render(true); return; }
   const sl = e.target.closest('[data-sel]'); if (sl) { sel = sl.dataset.sel; render(true); return; }
   const b = e.target.closest('[data-act]'); if (!b) return; e.preventDefault();
   try { if (b.dataset.confirm && !confirm(b.dataset.confirm)) return; await ACT[b.dataset.act](b.dataset); } catch (x) { toast(x.message, 'bad'); }
