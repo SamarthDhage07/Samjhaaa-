@@ -1,1 +1,1 @@
-{"name":"surplus-relay","version":"1.0.0","private":true,"description":"Real-time surplus donation and delivery prototype","scripts":{"start":"node server.js","test":"node --test test/engine.test.js"},"engines":{"node":">=18"}}
+{"name":"surplus-relay","version":"1.0.0","private":true,"description":"Real-time surplus donation and delivery prototype","scripts":{"start":"node server.js","dev":"node server.js","test":"node --test test/engine.test.js"},"engines":{"node":">=18"}}
