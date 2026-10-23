@@ -37,12 +37,13 @@ const F = {
 const field = ([k, l, t, o], v = '', req) => `<label>${l}${t === 'select' ? `<select name="${k}">${(o === 'donors' ? (PUB?.donors || []).map(d => [d.id, d.name]) : o.map(x => [x, x])).map(([a, b]) => `<option value="${esc(a)}" ${a == v ? 'selected' : ''}>${esc(b)}</option>`).join('')}</select>` : `<input name="${k}" type="${t || 'text'}" step="any" value="${esc(v)}" ${req ? 'required' : ''} autocomplete="off">`}</label>`;
 
 /* ---------- public pages ---------- */
-function topPub() { return `<header class="top"><div class="wrap"><a class="logo" href="#/">${BRAND}</a><button class="l" data-scroll="how">How it works</button><button class="l" data-scroll="roles">Roles</button><a class="l" href="#/login">Log in</a><a class="btn p s" href="#/register/donor">Register</a></div></header>`; }
+function topPub() { return `<header class="top"><div class="wrap"><a class="logo" href="#/">${BRAND}</a><button class="l" data-scroll="how-it-works">How it works</button><button class="l" data-scroll="roles">Roles</button><a class="l" href="#/login">Log in</a><a class="btn p s" href="#/register/donor">Donate surplus</a></div></header>`; }
 function footer() { return `<footer class="foot"><div class="wrap"><div class="row" style="margin-bottom:12px"><a href="#/">Home</a><a href="#/login">Log in</a><a href="#/register/donor">Register</a><a href="#/privacy">Privacy Policy</a><a href="#/terms">Terms and Conditions</a><a href="mailto:contact@surplusrelay.example">contact@surplusrelay.example</a></div><p>${BRAND} is a working prototype. Demo accounts and sample organizations are fictional.</p></div></footer>`; }
 const STEPS = ['Donor posts a surplus donation', 'Receiver requests or is matched with the donation', 'Donor approves the request', 'Rider is assigned', 'Receiver confirms rider assistance', 'Donation is delivered', 'Delivery is confirmed and remaining help is reallocated'];
 function landing() {
   const p = PUB || { items: [], events: [] };
   return `
+  ${topPub()}
   <div id="story-loader">
     <div class="loader-box">
       <div class="loader-brand">${BRAND}</div>
@@ -56,10 +57,10 @@ function landing() {
     <div id="story-stage" class="story-stage-pinned">
       <div id="seam-center-line" class="seam-center-line"></div>
       <div class="seam-layer seam-layer-left">
-        <canvas id="seam-canvas-left" class="seam-canvas"></canvas>
+        <canvas id="seam-canvas-left" class="seam-canvas seam-canvas-left"></canvas>
       </div>
       <div class="seam-layer seam-layer-right">
-        <canvas id="seam-canvas-right" class="seam-canvas"></canvas>
+        <canvas id="seam-canvas-right" class="seam-canvas seam-canvas-right"></canvas>
       </div>
       <div class="story-captions-container">
         <div id="caption-1" class="story-card">
@@ -89,7 +90,6 @@ function landing() {
   </div>
 
   <div class="site-content-layer">
-    ${topPub()}
     <section id="hero-section" class="hero-under-stage">
       <div class="wrap">
         <div class="hero-grid">
@@ -101,7 +101,8 @@ function landing() {
             <p class="hero-subtext">Connecting local kitchens, volunteer riders and shelters in real time with automatic expiry protection.</p>
             <div class="row">
               <a class="btn p" href="#/register/donor">Donate surplus</a>
-              <a class="btn" href="#how-it-works">See how it works</a>
+              <button class="btn" data-scroll="how-it-works">See how it works</button>
+              <button class="btn s" id="btn-replay-story" type="button" style="border-color:var(--line);color:var(--mut)">Replay intro</button>
             </div>
             
             <div class="role-tabs-wrap">
@@ -473,7 +474,16 @@ const ACT = {
   sound: () => { sound = !sound; if (sound) { aud = aud || new AudioContext(); siren(); } render(true); }, logout
 };
 document.addEventListener('click', async e => {
-  const s = e.target.closest('[data-scroll]'); if (s) { $('#' + s.dataset.scroll)?.scrollIntoView(); return; }
+  const s = e.target.closest('[data-scroll]');
+  if (s) {
+    if (window.completeStoryStage) window.completeStoryStage();
+    const el = document.getElementById(s.dataset.scroll);
+    if (el) {
+      if (window.lenisInstance) window.lenisInstance.scrollTo(el, { offset: -70 });
+      else el.scrollIntoView({ behavior: 'smooth' });
+    }
+    return;
+  }
   const sl = e.target.closest('[data-sel]'); if (sl) { sel = sl.dataset.sel; render(true); return; }
   const b = e.target.closest('[data-act]'); if (!b) return; e.preventDefault();
   try { if (b.dataset.confirm && !confirm(b.dataset.confirm)) return; await ACT[b.dataset.act](b.dataset); } catch (x) { toast(x.message, 'bad'); }

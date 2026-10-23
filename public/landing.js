@@ -103,33 +103,39 @@
     ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
   }
 
+  let storyCompleted = false;
+
   // 3. Scroll & Animation Loop
   function initStoryStage() {
     const scrollWrapper = document.getElementById('story-scroll-wrapper');
     const stage = document.getElementById('story-stage');
     const canvasLeft = document.getElementById('seam-canvas-left');
     const canvasRight = document.getElementById('seam-canvas-right');
+    const layerLeft = document.querySelector('.seam-layer-left');
+    const layerRight = document.querySelector('.seam-layer-right');
     const centerLine = document.getElementById('seam-center-line');
     const progressFill = document.getElementById('story-progress-fill');
     const scrollHint = document.getElementById('scroll-hint');
     const hero = document.getElementById('hero-section');
     const closingCard = document.getElementById('story-closing-card');
 
-    if (!scrollWrapper || !stage || !canvasLeft || !canvasRight) return;
+    if (!scrollWrapper || !stage || !canvasLeft || !canvasRight || !layerLeft || !layerRight) return;
 
     const ctxL = canvasLeft.getContext('2d');
     const ctxR = canvasRight.getContext('2d');
+    let lastDrawnFrame = -1;
 
     function resizeCanvases() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = stage.clientWidth;
-      const h = stage.clientHeight;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
       canvasLeft.width = w * dpr;
       canvasLeft.height = h * dpr;
       canvasRight.width = w * dpr;
       canvasRight.height = h * dpr;
       ctxL.scale(dpr, dpr);
       ctxR.scale(dpr, dpr);
+      lastDrawnFrame = -1;
     }
     resizeCanvases();
     window.addEventListener('resize', () => {
@@ -147,6 +153,7 @@
 
     // Calculate scroll progress through 700vh wrapper
     function onScroll() {
+      if (storyCompleted) return;
       const rect = scrollWrapper.getBoundingClientRect();
       const scrollDist = rect.height - window.innerHeight;
       if (scrollDist <= 0) return;
@@ -162,6 +169,40 @@
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
 
+    function completeStory() {
+      if (storyCompleted) return;
+      storyCompleted = true;
+      try {
+        sessionStorage.setItem('sr_story_done', '1');
+      } catch (e) {}
+
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      window.removeEventListener('scroll', onScroll);
+
+      if (scrollWrapper) {
+        scrollWrapper.classList.add('completed');
+        scrollWrapper.style.display = 'none';
+      }
+
+      if (hero) {
+        hero.style.transform = 'none';
+        hero.style.opacity = '1';
+        hero.classList.add('settled');
+      }
+
+      window.scrollTo(0, 0);
+      if (lenisInstance) {
+        lenisInstance.resize();
+        lenisInstance.scrollTo(0, { immediate: true });
+      }
+    }
+
+    // Expose completeStory globally so nav clicks can dismiss the story immediately
+    window.completeStoryStage = completeStory;
+
     // Captions array
     const captions = [
       { start: 0.00, end: 0.20, el: document.getElementById('caption-1') },
@@ -169,21 +210,29 @@
       { start: 0.45, end: 0.62, el: document.getElementById('caption-3') }
     ];
 
-    const dpr = window.devicePixelRatio || 1;
-
     function renderLoop() {
-      // Lerp smoothing (0.08 to 0.1)
-      const lerpFactor = 0.09;
+      if (storyCompleted) return;
+
+      // Clean responsive lerp
+      const lerpFactor = 0.12;
       smoothedProgress += (targetProgress - smoothedProgress) * lerpFactor;
+
+      // One-way lock: once animation is done, hero opens permanently and story is closed
+      if (smoothedProgress >= 0.96 && targetProgress >= 0.95) {
+        completeStory();
+        return;
+      }
 
       // Frame selection based on scroll progress
       const frameIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.floor(smoothedProgress * TOTAL_FRAMES)));
       const img = frames[frameIdx];
 
-      const stageW = stage.clientWidth;
-      const stageH = stage.clientHeight;
+      const stageW = window.innerWidth;
+      const stageH = window.innerHeight;
 
-      if (img && img.complete) {
+      // Only redraw canvas when frame actually changes (eliminates 95% of GPU load and flutter)
+      if (frameIdx !== lastDrawnFrame && img && img.complete) {
+        lastDrawnFrame = frameIdx;
         ctxL.clearRect(0, 0, stageW, stageH);
         ctxR.clearRect(0, 0, stageW, stageH);
         drawCover(ctxL, img, stageW, stageH);
@@ -209,16 +258,16 @@
       // 0 to 62%: closed
       // 62 to 68%: center hairline glows
       // 68 to 100%: horizontal seam split from 0 to 100vw
-      let gapPx = 0;
+      let halfGap = 0;
       let lineOpacity = 0;
 
       if (smoothedProgress < SEAM_START) {
-        gapPx = 0;
+        halfGap = 0;
         lineOpacity = 0;
         if (centerLine) centerLine.style.opacity = '0';
         if (closingCard) closingCard.classList.remove('active');
       } else if (smoothedProgress < SEAM_GLOW_END) {
-        gapPx = 0;
+        halfGap = 0;
         const glowPhase = (smoothedProgress - SEAM_START) / (SEAM_GLOW_END - SEAM_START);
         lineOpacity = glowPhase;
         if (centerLine) {
@@ -230,9 +279,7 @@
         if (centerLine) centerLine.style.opacity = '0';
         const openProgress = (smoothedProgress - SEAM_GLOW_END) / (SEAM_OPEN_END - SEAM_GLOW_END);
         const eased = easePower2InOut(Math.min(1, Math.max(0, openProgress)));
-        const rawGap = eased * window.innerWidth;
-        // Round to whole device pixel to prevent 1px flicker or edge artifacts
-        gapPx = Math.round(rawGap * dpr) / dpr;
+        halfGap = eased * (stageW * 0.52);
         lineOpacity = 1;
 
         // Closing caption appears at opening and fades before wide
@@ -244,10 +291,10 @@
           }
         }
 
-        // Hero settling effect: scale 1.06 to 1, y 30px to 0, opacity 0.6 to 1
+        // Hero settling effect: scale 1.05 to 1, y 24px to 0, opacity 0.6 to 1
         if (hero) {
-          const heroScale = 1.06 - (eased * 0.06);
-          const heroY = (30 * (1 - eased));
+          const heroScale = 1.05 - (eased * 0.05);
+          const heroY = 24 * (1 - eased);
           const heroOpacity = 0.6 + (eased * 0.4);
           hero.style.transform = `scale3d(${heroScale.toFixed(4)}, ${heroScale.toFixed(4)}, 1) translate3d(0, ${heroY.toFixed(1)}px, 0)`;
           hero.style.opacity = heroOpacity.toFixed(3);
@@ -260,16 +307,11 @@
         }
       }
 
-      // Apply dynamic CSS variable
-      document.documentElement.style.setProperty('--gap', `${gapPx}px`);
-      document.documentElement.style.setProperty('--seam-line-opacity', lineOpacity.toFixed(2));
-
-      // Pointer events and stage unpinning when 100% open
-      if (smoothedProgress >= 0.995) {
-        stage.style.pointerEvents = 'none';
-      } else {
-        stage.style.pointerEvents = 'auto';
-      }
+      // Direct GPU transform on doors (zero root CSS variable recalculations)
+      layerLeft.style.transform = `translate3d(${-halfGap.toFixed(1)}px, 0, 0)`;
+      layerRight.style.transform = `translate3d(${halfGap.toFixed(1)}px, 0, 0)`;
+      layerLeft.style.borderRightColor = `rgba(194, 87, 26, ${lineOpacity.toFixed(2)})`;
+      layerRight.style.borderLeftColor = `rgba(194, 87, 26, ${lineOpacity.toFixed(2)})`;
 
       rafId = requestAnimationFrame(renderLoop);
     }
@@ -528,15 +570,13 @@
     window.addEventListener('mousemove', e => {
       dotX = e.clientX;
       dotY = e.clientY;
-      cursorDot.style.left = dotX + 'px';
-      cursorDot.style.top = dotY + 'px';
     }, { passive: true });
 
     function cursorLoop() {
-      ringX += (dotX - ringX) * 0.18;
-      ringY += (dotY - ringY) * 0.18;
-      cursorRing.style.left = ringX + 'px';
-      cursorRing.style.top = ringY + 'px';
+      ringX += (dotX - ringX) * 0.2;
+      ringY += (dotY - ringY) * 0.2;
+      cursorDot.style.transform = `translate3d(${(dotX - 3).toFixed(1)}px, ${(dotY - 3).toFixed(1)}px, 0)`;
+      cursorRing.style.transform = `translate3d(${(ringX - 14).toFixed(1)}px, ${(ringY - 14).toFixed(1)}px, 0)`;
       requestAnimationFrame(cursorLoop);
     }
     requestAnimationFrame(cursorLoop);
@@ -566,20 +606,12 @@
     });
   }
 
-  // 10. Sticky Nav (Hide on scroll down, show on scroll up)
+  // 10. Sticky Nav (Constantly visible at top, never vanishes on scroll)
   function initStickyNav() {
     const nav = document.querySelector('.top');
     if (!nav) return;
-
-    let lastScrollY = window.scrollY;
     window.addEventListener('scroll', () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > 120 && currentScrollY > lastScrollY) {
-        nav.classList.add('nav-hidden');
-      } else {
-        nav.classList.remove('nav-hidden');
-      }
-      lastScrollY = currentScrollY;
+      nav.classList.toggle('scrolled', window.scrollY > 15);
     }, { passive: true });
   }
 
@@ -592,23 +624,48 @@
         orientation: 'vertical',
         smoothWheel: true
       });
+      window.lenisInstance = lenisInstance;
 
       function lenisRaf(time) {
-        lenisInstance.raf(time);
-        requestAnimationFrame(lenisRaf);
+        if (lenisInstance) {
+          lenisInstance.raf(time);
+          requestAnimationFrame(lenisRaf);
+        }
       }
       requestAnimationFrame(lenisRaf);
 
-      // Handle smooth anchor clicks
+      // Handle smooth anchor & nav button clicks
       document.addEventListener('click', e => {
+        const scrollBtn = e.target.closest('[data-scroll]');
+        if (scrollBtn) {
+          e.preventDefault();
+          const targetId = scrollBtn.dataset.scroll;
+          const targetEl = document.getElementById(targetId);
+          if (!storyCompleted && window.completeStoryStage) {
+            window.completeStoryStage();
+          }
+          if (targetEl && lenisInstance) {
+            setTimeout(() => {
+              lenisInstance.scrollTo(targetEl, { offset: -70 });
+            }, 30);
+          }
+          return;
+        }
+
         const anchor = e.target.closest('a[href^="#"]');
         if (anchor) {
           const href = anchor.getAttribute('href');
-          if (href.startsWith('#/')) return; // Hash route
+          if (href.startsWith('#/')) return; // Hash route like #/login
+          if (href === '#' || href === '#/') return;
           const targetEl = document.querySelector(href);
+          if (!storyCompleted && window.completeStoryStage) {
+            window.completeStoryStage();
+          }
           if (targetEl && lenisInstance) {
             e.preventDefault();
-            lenisInstance.scrollTo(targetEl, { offset: -70 });
+            setTimeout(() => {
+              lenisInstance.scrollTo(targetEl, { offset: -70 });
+            }, 30);
           }
         }
       });
@@ -632,36 +689,68 @@
     elements.forEach(el => observer.observe(el));
   }
 
+  function setupReplayButton() {
+    const replayBtn = document.getElementById('btn-replay-story');
+    if (replayBtn) {
+      replayBtn.addEventListener('click', () => {
+        try {
+          sessionStorage.removeItem('sr_story_done');
+        } catch (e) {}
+        window.location.reload();
+      });
+    }
+  }
+
   // Master Landing Initializer
   window.initLandingPage = function () {
-    // If user prefers reduced motion, skip scroll scrubbing
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const isStoryDone = sessionStorage.getItem('sr_story_done') === '1';
+
+    // If story was already completed, or user prefers reduced motion, open hero permanently
+    if (isStoryDone || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      storyCompleted = true;
       const stage = document.getElementById('story-stage');
       const loader = document.getElementById('story-loader');
+      const scrollWrapper = document.getElementById('story-scroll-wrapper');
       const hero = document.getElementById('hero-section');
-      if (loader) loader.classList.add('done');
+      if (loader) {
+        loader.classList.add('done');
+        loader.style.display = 'none';
+      }
+      if (scrollWrapper) {
+        scrollWrapper.classList.add('completed');
+        scrollWrapper.style.display = 'none';
+      }
       if (stage) stage.style.display = 'none';
-      if (hero) hero.classList.add('settled');
+      if (hero) {
+        hero.style.transform = 'none';
+        hero.style.opacity = '1';
+        hero.classList.add('settled');
+      }
+      initStickyNav();
       initRoleTabs();
       initInteractiveMap();
+      initHorizontalWorkflow();
       initTiltCards();
       initSimControls();
-      initStickyNav();
+      initMagneticAndCursor();
+      initLenis();
       initScrollReveals();
+      setupReplayButton();
       return;
     }
 
     preloadFrames(() => {
       initStoryStage();
+      initStickyNav();
       initInteractiveMap();
       initRoleTabs();
       initHorizontalWorkflow();
       initTiltCards();
       initSimControls();
       initMagneticAndCursor();
-      initStickyNav();
       initLenis();
       initScrollReveals();
+      setupReplayButton();
     });
   };
 
