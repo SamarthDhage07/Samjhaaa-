@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3000, DB = path.join(__dirname, 'data', 'db.jso
 const E = create();
 if (process.env.KEEP_DATA) { try { E.load(JSON.parse(fs.readFileSync(DB, 'utf8'))); } catch { E.seed(); } } else E.seed();
 const clients = new Set(); let lastV = -1, saveT = null;
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.png': 'image/png', '.woff2': 'font/woff2' };
 const R = [];
 const route = (m, p, roles, fn) => R.push([m, new RegExp('^/api' + p + '$'), roles, fn]);
 const pubInfo = () => {

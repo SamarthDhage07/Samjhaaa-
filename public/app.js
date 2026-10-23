@@ -42,19 +42,290 @@ function footer() { return `<footer class="foot"><div class="wrap"><div class="r
 const STEPS = ['Donor posts a surplus donation', 'Receiver requests or is matched with the donation', 'Donor approves the request', 'Rider is assigned', 'Receiver confirms rider assistance', 'Donation is delivered', 'Delivery is confirmed and remaining help is reallocated'];
 function landing() {
   const p = PUB || { items: [], events: [] };
-  return topPub() + `<main id="main"><div class="wrap"><section class="hero"><div><h1 class="rv" style="--i:0">Surplus food reaches a shelter before it spoils.</h1><p class="rv" style="--i:1">${BRAND} coordinates kitchens, volunteer riders and receiving organizations in real time. Before any rider is sent, the system checks expiry, rider capacity, receiving hours and whether the receiver has the water, fuel and storage to use the food safely.</p><div class="row rv" style="--i:2"><a class="btn p" href="#/login">Log in</a><a class="btn" href="#/login?demo">View the demo</a></div></div><div class="rv" style="--i:3">${p.items.length ? ring(p.items.map(i => ({ ...i, cls: i.ok ? (i.urgent ? 'amber' : 'green') : 'bad' })), p.center || 'Receiver', true) : ''}<p class="mut" style="margin-top:8px">Live view from the demo data: nearby donors around ${esc(p.center || 'a receiver')}, sized by quantity.</p></div></section></div>
-<section class="sec band" id="how"><div class="wrap"><h2>How a donation moves</h2><div class="grid">${STEPS.map((s, i) => `<div class="card step rv"><div class="n">${i + 1}</div><h3>${s}</h3></div>`).join('')}</div></div></section>
-<section class="sec" id="roles"><div class="wrap"><h2>What each role gets</h2><div class="grid">
-<div class="card lift rv">${ic('box')}<h3>Donors</h3><p>Post surplus with an expiry time and safety needs. Accept or reject requests with distance, travel time and expiry feasibility in front of you.</p></div>
-<div class="card lift rv">${ic('truck')}<h3>Riders</h3><p>Receive reserved assignments sized to your capacity, with pickup and drop-off details, an expiry countdown and controls to report delays or failures.</p></div>
-<div class="card lift rv">${ic('home')}<h3>Receivers</h3><p>Publish current needs and resources, discover nearby donors on the Emergency view, and see rider details as soon as help is assigned.</p></div>
-<div class="card lift rv">${ic('shield')}<h3>Admins</h3><p>Watch urgent donations, pending confirmations, failures and reassignments, read the audit log, and override with confirmation.</p></div></div></div></section>
-<section class="sec alt"><div class="wrap"><h2>Safety and reliability rules</h2><div class="grid">
-<div class="card lift rv">${ic('clock')}<h3>Expiry is a hard stop</h3><p>A donation is never dispatched unless the route finishes before expiry, plus a configurable safety buffer.</p></div>
-<div class="card lift rv">${ic('check')}<h3>No ghost reservations</h3><p>Every pending step has a visible countdown. When it ends, the donation, rider and quantity are released and the next option is suggested.</p></div>
-<div class="card lift rv">${ic('route')}<h3>Recovery by rule</h3><p>Rider failure, delay or an unconfirmed receiver triggers reassignment with a reason and a full event timeline.</p></div>
-<div class="card lift rv">${ic('shield')}<h3>Compatibility checks</h3><p>Categories, cooking needs, cold storage, receiving hours and demand are validated on the server for every request.</p></div></div>
-<h3 style="margin-top:32px">Recent events from the demo</h3><div class="card">${p.events.length ? p.events.map(e => `<div>${chip(e.s)} <span class="mut">${new Date(e.t).toLocaleTimeString()}</span></div>`).join('') : '<p class="mut">No events yet.</p>'}</div></div></section></main>` + footer();
+  return `
+  <div id="story-loader">
+    <div class="loader-box">
+      <div class="loader-brand">${BRAND}</div>
+      <p class="mut" style="margin-bottom:12px">Connecting surplus meals to local shelters</p>
+      <div class="loader-track"><div id="loader-fill" class="loader-fill"></div></div>
+      <div id="loader-text" class="loader-text">Preloading story frames: 0%</div>
+    </div>
+  </div>
+
+  <div id="story-scroll-wrapper" class="story-scroll-wrapper">
+    <div id="story-stage" class="story-stage-pinned">
+      <div id="seam-center-line" class="seam-center-line"></div>
+      <div class="seam-layer seam-layer-left">
+        <canvas id="seam-canvas-left" class="seam-canvas"></canvas>
+      </div>
+      <div class="seam-layer seam-layer-right">
+        <canvas id="seam-canvas-right" class="seam-canvas"></canvas>
+      </div>
+      <div class="story-captions-container">
+        <div id="caption-1" class="story-card">
+          <div class="story-num">01</div>
+          <p class="story-text">A restaurant has food it cannot sell tonight.</p>
+        </div>
+        <div id="caption-2" class="story-card">
+          <div class="story-num">02</div>
+          <p class="story-text">The platform finds a volunteer rider on the closest route.</p>
+        </div>
+        <div id="caption-3" class="story-card">
+          <div class="story-num">03</div>
+          <p class="story-text">The rider picks up the donation before it expires.</p>
+        </div>
+      </div>
+      <div id="story-closing-card" class="story-closing-card">
+        A shelter confirms delivery. Nothing goes to waste.
+      </div>
+      <div class="story-progress-bar">
+        <div id="story-progress-fill" class="story-progress-fill"></div>
+      </div>
+      <div id="scroll-hint" class="scroll-hint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        <span>Scroll</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="site-content-layer">
+    ${topPub()}
+    <section id="hero-section" class="hero-under-stage">
+      <div class="wrap">
+        <div class="hero-grid">
+          <div>
+            <h1 class="hero-title">
+              <span class="hero-title-line"><span>Surplus food,</span></span>
+              <span class="hero-title-line"><span>delivered before it expires.</span></span>
+            </h1>
+            <p class="hero-subtext">Connecting local kitchens, volunteer riders and shelters in real time with automatic expiry protection.</p>
+            <div class="row">
+              <a class="btn p" href="#/register/donor">Donate surplus</a>
+              <a class="btn" href="#how-it-works">See how it works</a>
+            </div>
+            
+            <div class="role-tabs-wrap">
+              <div class="role-tab-buttons">
+                <button class="role-tab-btn active" data-role="donor">Donor</button>
+                <button class="role-tab-btn" data-role="rider">Rider</button>
+                <button class="role-tab-btn" data-role="shelter">Shelter</button>
+              </div>
+              <div class="role-tab-panel active" data-panel="donor">
+                <p class="mut" style="margin:0">List surplus in seconds with automatic safety, packaging and expiry tracking.</p>
+                <div class="role-panel-card">
+                  <h4><span>Shree Kitchen</span><span class="chip ok">Available</span></h4>
+                  <p style="margin:0;font-size:0.88rem">45 portions Cooked meals. Expires in <span class="timer">2h 45m</span>. Safety: Keep hot.</p>
+                </div>
+              </div>
+              <div class="role-tab-panel" data-panel="rider">
+                <p class="mut" style="margin:0">Receive reserved assignments sized to your vehicle capacity with zero ghost bookings.</p>
+                <div class="role-panel-card">
+                  <h4><span>Scooter Route #12</span><span class="chip">Reserved</span></h4>
+                  <p style="margin:0;font-size:0.88rem">Pickup: Shree Kitchen (4.5 km) - Deliver: Asha Shelter (12 min).</p>
+                </div>
+              </div>
+              <div class="role-tab-panel" data-panel="shelter">
+                <p class="mut" style="margin:0">Publish current demand and receive verified deliveries matched to your storage and fuel capabilities.</p>
+                <div class="role-panel-card">
+                  <h4><span>Asha Shelter</span><span class="chip ok">Demand Matched</span></h4>
+                  <p style="margin:0;font-size:0.88rem">Occupancy 72/90. Incoming: 45 portions hot meals arriving via Rider Arjun.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="hero-map-box">
+            <div class="hero-map-header">
+              <span>CITY RELAY CORRIDOR</span>
+              <span class="sim-badge">Live simulation</span>
+            </div>
+            <svg id="hero-map-svg" class="hero-map-svg" viewBox="0 0 560 420">
+              <defs>
+                <pattern id="street-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" class="map-bg-grid" />
+                </pattern>
+              </defs>
+              <rect width="560" height="420" fill="#EAE7E0" />
+              <rect width="560" height="420" fill="url(#street-grid)" />
+              <g id="map-grid-layer">
+                <path class="map-road" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" />
+                <path class="map-road-center" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" />
+              </g>
+              <path id="map-route-line" class="map-route-line" d="M 120 320 L 240 320 L 240 160 L 430 160" />
+              <g transform="translate(430, 160)">
+                <circle r="22" class="map-shelter-pulse" />
+                <circle r="12" class="map-shelter-marker" />
+                <rect x="-6" y="-6" width="12" height="12" fill="#FAF6EF" rx="2" />
+                <text y="28" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="11" fill="var(--ink)">Asha Shelter</text>
+              </g>
+              <g id="map-dynamic-pin">
+                <g class="map-donor-pin">
+                  <circle cx="120" cy="320" r="9" fill="#C2571A" stroke="#FAF6EF" stroke-width="2.5" />
+                  <circle cx="120" cy="320" r="3" fill="#FAF6EF" />
+                  <text x="120" y="342" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="11" fill="var(--ink)">Donation</text>
+                </g>
+              </g>
+              <g id="map-truck" class="map-truck-icon" transform="translate(108, 308)">
+                <rect width="24" height="14" rx="3" fill="#C2571A" />
+                <circle cx="6" cy="14" r="3.5" fill="#1E1B18" />
+                <circle cx="18" cy="14" r="3.5" fill="#1E1B18" />
+                <rect x="14" y="2" width="7" height="6" rx="1" fill="#FAF6EF" />
+              </g>
+              <g id="map-check" class="map-check-icon" transform="translate(416, 146)" opacity="0">
+                <circle cx="14" cy="14" r="14" fill="#2F7A52" />
+                <path d="M 8 14 L 12 18 L 20 10" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+              </g>
+            </svg>
+            <div id="map-instruction" class="map-instruction-tag">Click anywhere on the map to test a dispatch</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="how-it-works-wrap">
+      <div id="how-pinned-container" class="how-pinned-container">
+        <div id="how-sticky-track" class="how-sticky-track">
+          <div id="how-panels-flex" class="how-panels-flex">
+            <div class="how-panel-card in-view">
+              <div class="n">01</div>
+              <h3>Donor lists surplus</h3>
+              <p>Kitchens and caterers post excess portions with safe handling requirements, storage temperatures and strict expiry windows.</p>
+              <svg class="how-svg-illustration" viewBox="0 0 320 140">
+                <rect class="draw-path" x="40" y="30" width="100" height="80" rx="6" />
+                <path class="draw-path" d="M 40 60 L 140 60 M 90 30 L 90 110" />
+                <rect class="draw-path" x="170" y="45" width="110" height="65" rx="6" />
+                <path class="draw-path" d="M 170 70 L 280 70 M 200 45 L 200 110" />
+                <circle class="draw-path" cx="250" cy="58" r="4" fill="#C2571A" />
+              </svg>
+            </div>
+            <div class="how-panel-card">
+              <div class="n">02</div>
+              <h3>Rider is matched</h3>
+              <p>The routing engine calculates travel duration and vehicle capacity to reserve the nearest available courier on the corridor.</p>
+              <svg class="how-svg-illustration" viewBox="0 0 320 140">
+                <path class="draw-path" d="M 30 100 Q 120 20 220 80 T 290 50" />
+                <circle class="draw-path" cx="30" cy="100" r="8" fill="#C2571A" />
+                <circle class="draw-path" cx="290" cy="50" r="8" fill="#1E1B18" />
+                <rect class="draw-path" x="145" y="45" width="30" height="18" rx="4" />
+                <circle class="draw-path" cx="152" cy="63" r="5" />
+                <circle class="draw-path" cx="168" cy="63" r="5" />
+              </svg>
+            </div>
+            <div class="how-panel-card">
+              <div class="n">03</div>
+              <h3>Direct courier pickup</h3>
+              <p>The courier verifies packaging, collects the batch before expiration buffers, and begins GPS guided transit.</p>
+              <svg class="how-svg-illustration" viewBox="0 0 320 140">
+                <path class="draw-path" d="M 50 110 L 110 50 L 160 80 L 240 30" />
+                <rect class="draw-path" x="195" y="55" width="80" height="55" rx="6" />
+                <path class="draw-path" d="M 215 55 L 215 40 Q 235 25 255 40 L 255 55" />
+                <circle class="draw-path" cx="235" cy="82" r="10" />
+                <path class="draw-path" d="M 231 82 L 234 85 L 240 79" />
+              </svg>
+            </div>
+            <div class="how-panel-card">
+              <div class="n">04</div>
+              <h3>Shelter confirms delivery</h3>
+              <p>The shelter inspects temperature, logs receipt, and immediately updates live occupancy demand so nothing goes to waste.</p>
+              <svg class="how-svg-illustration" viewBox="0 0 320 140">
+                <path class="draw-path" d="M 40 110 L 40 55 L 120 20 L 200 55 L 200 110 Z" />
+                <rect class="draw-path" x="100" y="70" width="40" height="40" rx="3" />
+                <circle class="draw-path" cx="250" cy="70" r="28" />
+                <path class="draw-path" d="M 238 70 L 246 78 L 264 60" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="roles" class="sec">
+      <div class="wrap">
+        <div class="scroll-reveal">
+          <h2>Built for every participant</h2>
+          <p class="mut">Purpose built workflows for kitchens, volunteer dispatchers, and receiving communities.</p>
+        </div>
+        <div class="roles-grid scroll-reveal">
+          <div class="tilt-card">
+            ${ic('box')}
+            <h3>Donors</h3>
+            <p>Post food surplus with packaging and expiry constraints. Review route travel feasibility before accepting requests.</p>
+            <a class="card-arrow-link" href="#/register/donor">Register kitchen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
+          <div class="tilt-card">
+            ${ic('truck')}
+            <h3>Riders</h3>
+            <p>Accept reserved deliveries sized to your carrying capacity. Get automated delay and timeout protection on every route.</p>
+            <a class="card-arrow-link" href="#/register/rider">Join as rider <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
+          <div class="tilt-card">
+            ${ic('home')}
+            <h3>Receivers</h3>
+            <p>Publish current demand, discover verified nearby donors, and track courier approach in real time.</p>
+            <a class="card-arrow-link" href="#/register/receiver">Register shelter <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
+          <div class="tilt-card">
+            ${ic('shield')}
+            <h3>Admins</h3>
+            <p>Oversee urgent donations, resolve bottlenecks, monitor audit logs, and trigger contingency reallocations.</p>
+            <a class="card-arrow-link" href="#/login">Admin console <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec alt">
+      <div class="wrap">
+        <div class="scroll-reveal">
+          <h2>Live contingency controls</h2>
+          <p class="mut">Test how the automated dispatch engine responds to unpredictable field conditions in real time.</p>
+        </div>
+        <div class="sim-controls-card scroll-reveal">
+          <div class="sim-toggles-grid">
+            <div class="sim-toggle-item" data-sim="rider">
+              <div class="sim-toggle-header">
+                <span>Rider drops out</span>
+                <div class="sim-toggle-switch"></div>
+              </div>
+              <div class="sim-toggle-desc">Simulate a courier breakdown or flat tire during transit.</div>
+            </div>
+            <div class="sim-toggle-item" data-sim="expiry">
+              <div class="sim-toggle-header">
+                <span>Nears expiry</span>
+                <div class="sim-toggle-switch"></div>
+              </div>
+              <div class="sim-toggle-desc">Drop safe window to under 30 minutes to trigger buffer priority.</div>
+            </div>
+            <div class="sim-toggle-item" data-sim="demand">
+              <div class="sim-toggle-header">
+                <span>Demand spike</span>
+                <div class="sim-toggle-switch"></div>
+              </div>
+              <div class="sim-toggle-desc">Increase shelter occupant demand and trigger split delivery.</div>
+            </div>
+          </div>
+          
+          <div class="sim-output-box">
+            <div class="row" style="justify-content:space-between;margin-bottom:14px;border-bottom:1px solid var(--line-light);padding-bottom:12px">
+              <div>
+                <b id="sim-rider-text">Rider #4 (Scooter) - Active on route</b>
+                <div class="mut" style="font-size:0.85rem"><span id="sim-demand-text">Demand: 40 portions</span> - Expiry: <span id="sim-timer-text" class="timer">2h 45m</span></div>
+              </div>
+              <div id="sim-status-chip" class="chip ok">In transit</div>
+            </div>
+            <div id="sim-interactive-log">
+              <div class="sim-log-row">
+                <span class="chip ok">System Ready</span>
+                <span>Simulation engine initialized with live rule constraints.</span>
+                <span class="mut" style="margin-left:auto;font-size:0.8rem">12:00:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  ` + footer();
 }
 const ALL = [['Donor: Shree Kitchen', 'donor@demo.test'], ['Donor: Annapurna Caterers', 'donor2@demo.test'], ['Rider: Arjun Patil', 'rider@demo.test'], ['Rider: Meera Shah', 'rider2@demo.test'], ['Rider: Neha Rao', 'rider3@demo.test'], ['Receiver: Asha Shelter', 'receiver@demo.test'], ['Receiver: Seva Student Hostel', 'receiver2@demo.test'], ['Receiver: Wakad Relief Center', 'receiver3@demo.test'], ['Admin', 'admin@demo.test']];
 function loginPage() {
@@ -165,8 +436,28 @@ function render(force) {
   if (h.startsWith('app')) { if (!TOK) { location.hash = '#/login'; return; } if (!S) return; html = shell(h); }
   else if (h === 'login') html = loginPage(); else if (h.startsWith('register')) html = registerPage(h.split('/')[1] || 'donor'); else if (h === 'privacy' || h === 'terms') html = legal(h); else html = landing();
   const app = $('#app'); app.className = h !== lastH ? 'enter' : ''; lastH = h; app.innerHTML = html; countUp();
+  if (!h || h === '/') {
+    if (window.initLandingPage) setTimeout(() => window.initLandingPage(), 10);
+  } else {
+    if (window.cleanupLandingPage) window.cleanupLandingPage();
+  }
 }
-addEventListener('hashchange', () => { sel = null; render(true); scrollTo(0, 0); if (location.hash.startsWith('#/app') && TOK && !S) refresh(); });
+addEventListener('hashchange', () => {
+  const wipe = document.getElementById('page-transition-wipe');
+  if (wipe) {
+    wipe.className = 'wiping-in';
+    setTimeout(() => {
+      sel = null;
+      render(true);
+      scrollTo(0, 0);
+      if (location.hash.startsWith('#/app') && TOK && !S) refresh();
+      wipe.className = 'wiping-out';
+      setTimeout(() => { wipe.className = ''; }, 250);
+    }, 200);
+  } else {
+    sel = null; render(true); scrollTo(0, 0); if (location.hash.startsWith('#/app') && TOK && !S) refresh();
+  }
+});
 document.addEventListener('focusout', () => setTimeout(() => { if (dirty && !document.activeElement.closest?.('form')) render(); }, 50));
 setInterval(() => document.querySelectorAll('[data-exp]').forEach(e => { const v = +e.dataset.exp; e.textContent = cd(v); e.classList.toggle('low', v - T() < 60000); }), 500);
 setInterval(() => { if (TOK) refresh().catch(() => { }); }, 6000);
