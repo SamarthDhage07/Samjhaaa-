@@ -329,10 +329,90 @@ function landing() {
   ` + footer();
 }
 const ALL = [['Donor: Shree Kitchen', 'donor@demo.test'], ['Donor: Annapurna Caterers', 'donor2@demo.test'], ['Rider: Arjun Patil', 'rider@demo.test'], ['Rider: Meera Shah', 'rider2@demo.test'], ['Rider: Neha Rao', 'rider3@demo.test'], ['Receiver: Asha Shelter', 'receiver@demo.test'], ['Receiver: Seva Student Hostel', 'receiver2@demo.test'], ['Receiver: Wakad Relief Center', 'receiver3@demo.test'], ['Admin', 'admin@demo.test']];
+
 function loginPage() {
-  const demo = [['Donor', 'donor@demo.test'], ['Rider', 'rider@demo.test'], ['Receiver', 'receiver@demo.test'], ['Admin', 'admin@demo.test']];
-  return topPub() + `<main id="main" class="wrap pg"><div class="narrow"><h1 style="font-size:2.2rem">Log in</h1><form class="f" data-form="login" style="grid-template-columns:1fr"><label>Email<input name="email" type="email" required></label><label>Password<input name="password" type="password" required></label><button class="btn p">Log in</button></form><p class="mut" style="margin-top:12px">By logging in you agree to the <a href="#/terms">Terms and Conditions</a> and <a href="#/privacy">Privacy Policy</a>.</p><h2 style="font-size:1.3rem;margin-top:28px">Demo accounts</h2><p class="mut">Password for every demo account: demo1234</p><div class="scroll"><table><thead><tr><th>Account</th><th>Email</th><th></th></tr></thead><tbody>${ALL.map(d => `<tr><td>${d[0]}</td><td>${d[1]}</td><td><button class="btn s p" data-act="demo" data-e="${d[1]}">Sign in</button></td></tr>`).join('')}</tbody></table></div><p style="margin-top:20px">No account? Register as <a href="#/register/donor">donor</a>, <a href="#/register/rider">rider</a> or <a href="#/register/receiver">receiver</a>.</p></div></main>` + footer();
+  return topPub() + `<main id="main" class="wrap pg">
+  <div class="auth-grid">
+    <div class="auth-card">
+      <div class="auth-header">
+        <span class="auth-badge">Security Gateway</span>
+        <h1 style="font-size:2.2rem;margin:10px 0 6px">Log in to ${BRAND}</h1>
+        <p class="auth-sub">Manage donations, dispatch volunteer couriers, or coordinate emergency shelter deliveries across the city corridor.</p>
+      </div>
+      <form class="f auth-form" data-form="login">
+        <label>
+          <span>Email Address</span>
+          <input name="email" type="email" placeholder="name@organization.org" required>
+        </label>
+        <label>
+          <span>Password</span>
+          <input name="password" type="password" placeholder="••••••••" required>
+        </label>
+        <button class="btn p full" style="font-size:1.02rem;padding:14px;font-weight:700">Enter Platform</button>
+      </form>
+      <div class="auth-footer-links">
+        <p class="mut" style="font-size:0.85rem;margin:0 0 10px">By signing in, you agree to our <a href="#/terms">Terms and Conditions</a> and <a href="#/privacy">Privacy Policy</a>.</p>
+        <p style="margin:0;font-size:0.92rem;font-weight:600">Need an account? Register as <a href="#/register/donor">Donor</a>, <a href="#/register/rider">Courier</a>, or <a href="#/register/receiver">Shelter</a>.</p>
+      </div>
+    </div>
+
+    <div class="auth-demo-card">
+      <div class="auth-demo-header">
+        <div>
+          <span class="auth-badge" style="background:var(--ivory);border:1px solid var(--line);color:var(--ink)">Instant Sandbox</span>
+          <h2 style="font-size:1.35rem;margin:6px 0 2px">Switch Role Profile</h2>
+          <p class="mut" style="margin:0;font-size:0.85rem">One-click test authentication (demo password: demo1234)</p>
+        </div>
+      </div>
+      <div class="persona-grid">
+        <div class="persona-item" data-act="demo" data-e="donor@demo.test">
+          <div class="persona-icon-box">${ic('box')}</div>
+          <div class="persona-info">
+            <div class="persona-meta"><span class="persona-role">Donor Facility</span><span class="persona-action">Enter &rarr;</span></div>
+            <div class="persona-name">Shree Kitchen</div>
+            <div class="persona-desc">Post surplus batches, track pickup timelines & expiry buffers</div>
+          </div>
+        </div>
+        <div class="persona-item" data-act="demo" data-e="rider@demo.test">
+          <div class="persona-icon-box">${ic('truck')}</div>
+          <div class="persona-info">
+            <div class="persona-meta"><span class="persona-role">Volunteer Courier</span><span class="persona-action">Enter &rarr;</span></div>
+            <div class="persona-name">Arjun Patil</div>
+            <div class="persona-desc">Two-wheeler courier, reserved capacity routes, live updates</div>
+          </div>
+        </div>
+        <div class="persona-item" data-act="demo" data-e="receiver@demo.test">
+          <div class="persona-icon-box">${ic('home')}</div>
+          <div class="persona-info">
+            <div class="persona-meta"><span class="persona-role">Receiving Shelter</span><span class="persona-action">Enter &rarr;</span></div>
+            <div class="persona-name">Asha Shelter</div>
+            <div class="persona-desc">Publish real-time demand, accept incoming deliveries</div>
+          </div>
+        </div>
+        <div class="persona-item" data-act="demo" data-e="admin@demo.test">
+          <div class="persona-icon-box">${ic('shield')}</div>
+          <div class="persona-info">
+            <div class="persona-meta"><span class="persona-role">Network Admin</span><span class="persona-action">Enter &rarr;</span></div>
+            <div class="persona-name">System Control</div>
+            <div class="persona-desc">Corridor oversight, live simulator lab, full audit logs</div>
+          </div>
+        </div>
+      </div>
+      <div class="auth-others-section">
+        <span style="font-size:0.8rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:10px">Other Participating Facilities</span>
+        <div class="persona-chips-row">
+          <button class="persona-chip-btn" data-act="demo" data-e="donor2@demo.test">Annapurna Caterers (Donor)</button>
+          <button class="persona-chip-btn" data-act="demo" data-e="rider2@demo.test">Meera Shah (Van)</button>
+          <button class="persona-chip-btn" data-act="demo" data-e="rider3@demo.test">Neha Rao (Cycle)</button>
+          <button class="persona-chip-btn" data-act="demo" data-e="receiver2@demo.test">Seva Student Hostel</button>
+          <button class="persona-chip-btn" data-act="demo" data-e="receiver3@demo.test">Wakad Relief Center</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>` + footer();
 }
+
 function registerPage(role) {
   return topPub() + `<main id="main" class="wrap pg"><h1 style="font-size:2.2rem">Register as ${role}</h1><div class="row" style="margin-bottom:16px">${['donor', 'rider', 'receiver'].map(r => `<a class="btn s ${r === role ? 'p' : ''}" href="#/register/${r}">${r}</a>`).join('')}</div><form class="f" data-form="register" data-role="${role}">${F[role].map(f => field(f, '', true)).join('')}${role === 'rider' ? '<p class="full mut">Verification status: new riders are pending until an admin verifies them.</p>' : ''}<p class="full mut">Categories: ${(PUB?.cats || ['Cooked meals', 'Packaged food', 'Dry rations', 'Bakery', 'Produce', 'Drinking water']).join(', ')}. Registering means you accept the <a href="#/terms">Terms and Conditions</a> and <a href="#/privacy">Privacy Policy</a>.</p><button class="btn p full" style="justify-self:start">Create account</button></form></main>` + footer();
 }
@@ -342,71 +422,469 @@ const LEGAL = {
 };
 function legal(k) { const [t, s] = LEGAL[k]; return topPub() + `<main id="main" class="wrap pg legal"><h1 style="font-size:2.4rem">${t}</h1>${s.map(([h, b]) => `<h2>${h}</h2><p>${b}</p>`).join('')}</main>` + footer(); }
 
-/* ---------- ring ---------- */
+/* ---------- expansive interactive proximity radar ---------- */
 function ring(items, center, small) {
-  const W = 640, c = W / 2, max = Math.max(5, Math.ceil(Math.max(...items.map(i => i.km || 0), 1) / 5) * 5);
-  const rings = [.25, .5, .75, 1].map(f => `<circle cx="${c}" cy="${c}" r="${f * c * .82}" class="rg"/><text x="${c + f * c * .82 + 3}" y="${c - 3}" class="rl">${+(f * max).toFixed(1)} km</text>`).join('');
-  const dots = items.map((it, i) => { const a = i / items.length * Math.PI * 2 - Math.PI / 2 + .4, r = Math.max(.12, (it.km || 0) / max) * c * .82, x = c + r * Math.cos(a), y = c + r * Math.sin(a), s = 9 + Math.min(22, Math.sqrt(it.qty) * 2.2); return `<g class="dot ${it.cls}${sel === it.id ? ' sel' : ''}" ${small ? '' : `tabindex="0" role="button" data-sel="${it.id}"`} aria-label="${esc(it.name)}, ${it.km} km, ${it.qty} units"><circle cx="${x}" cy="${y}" r="${s}"/><text x="${x}" y="${y + s + 12}" text-anchor="middle">${esc(it.name)}</text><text x="${x}" y="${y + s + 23}" text-anchor="middle" class="sub">${it.km} km, ${it.qty}</text></g>`; }).join('');
-  return `<svg viewBox="0 0 ${W} ${W}" class="ringsvg" role="group" aria-label="Distance rings around ${esc(center)}">${rings}<circle cx="${c}" cy="${c}" r="14" class="pulse"/><circle cx="${c}" cy="${c}" r="14" class="ctr"/><text x="${c}" y="${c + 30}" text-anchor="middle" class="ctl">${esc(center)}</text>${dots}</svg>`;
+  const W = 720, c = W / 2, max = Math.max(5, Math.ceil(Math.max(...items.map(i => i.km || 0), 1) / 5) * 5);
+  const rings = [.25, .5, .75, 1].map(f => {
+    const r = f * c * .82;
+    return `<circle cx="${c}" cy="${c}" r="${r}" class="radar-grid-ring"/><rect x="${c + r - 26}" y="${c - 10}" width="52" height="18" rx="4" class="radar-tag-bg"/><text x="${c + r}" y="${c + 3}" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="10" fill="var(--mut)">${+(f * max).toFixed(1)} km</text>`;
+  }).join('');
+
+  const sweep = `
+    <defs>
+      <radialGradient id="radarSweepGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#C2571A" stop-opacity="0.28" />
+        <stop offset="70%" stop-color="#C2571A" stop-opacity="0.06" />
+        <stop offset="100%" stop-color="#C2571A" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient id="sweepLineGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#C2571A" stop-opacity="0.1" />
+        <stop offset="100%" stop-color="#C2571A" stop-opacity="0.8" />
+      </linearGradient>
+    </defs>
+    <g class="radar-sweep-pivot" style="transform-origin:${c}px ${c}px">
+      <path d="M ${c} ${c} L ${c} ${c - c * 0.85} A ${c * 0.85} ${c * 0.85} 0 0 1 ${c + c * 0.6} ${c - c * 0.6} Z" fill="url(#radarSweepGrad)" />
+      <line x1="${c}" y1="${c}" x2="${c}" y2="${c - c * 0.85}" stroke="url(#sweepLineGrad)" stroke-width="2" />
+    </g>
+  `;
+
+  const crosshairs = `
+    <line x1="${c - c * 0.85}" y1="${c}" x2="${c + c * 0.85}" y2="${c}" class="radar-crosshair" />
+    <line x1="${c}" y1="${c - c * 0.85}" x2="${c}" y2="${c + c * 0.85}" class="radar-crosshair" />
+  `;
+
+  const dots = items.map((it, i) => {
+    const a = i / items.length * Math.PI * 2 - Math.PI / 2 + .35;
+    const r = Math.max(.14, (it.km || 0) / max) * c * .82;
+    const x = c + r * Math.cos(a);
+    const y = c + r * Math.sin(a);
+    const s = 11 + Math.min(20, Math.sqrt(it.qty) * 2.2);
+    const isSel = sel === it.id;
+    const badgeW = Math.max(90, it.name.length * 6.5 + 24);
+
+    return `
+      <g class="radar-node ${it.cls}${isSel ? ' sel' : ''}" ${small ? '' : `tabindex="0" role="button" data-sel="${it.id}"`} aria-label="${esc(it.name)}, ${it.km} km, ${it.qty} units">
+        <line x1="${c}" y1="${c}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.6" />
+        <circle cx="${x}" cy="${y}" r="${s + 9}" class="radar-halo" />
+        <circle cx="${x}" cy="${y}" r="${s}" class="radar-core" />
+        <circle cx="${x}" cy="${y}" r="${Math.max(4, s * 0.38)}" fill="#FAF6EF" opacity="0.9" />
+        <g transform="translate(${x}, ${y + s + 10})">
+          <rect x="${-badgeW / 2}" y="0" width="${badgeW}" height="28" rx="6" class="radar-label-badge" />
+          <text x="0" y="13" text-anchor="middle" class="node-title">${esc(it.name)}</text>
+          <text x="0" y="23" text-anchor="middle" class="node-sub">${it.km} km • ${it.qty} ${esc(it.unit || 'units')}</text>
+        </g>
+      </g>
+    `;
+  }).join('');
+
+  return `
+    <div class="ringsvg-container">
+      <svg viewBox="0 0 ${W} ${W}" class="ringsvg" role="group" aria-label="Distance proximity radar around ${esc(center)}">
+        <circle cx="${c}" cy="${c}" r="${c * 0.85}" fill="#FAF6EF" />
+        ${crosshairs}
+        ${rings}
+        ${sweep}
+        <circle cx="${c}" cy="${c}" r="16" class="radar-center-pulse" />
+        <circle cx="${c}" cy="${c}" r="10" class="radar-center-dot" />
+        <rect x="${c - 75}" y="${c + 18}" width="150" height="24" rx="6" fill="var(--ink)" />
+        <text x="${c}" y="${c + 34}" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="11" fill="#FAF6EF">${esc(center)}</text>
+        ${dots}
+      </svg>
+    </div>
+  `;
 }
-const legendHtml = `<p class="legend"><span><i class="sw" style="background:var(--g)"></i>Compatible</span><span><i class="sw" style="background:var(--a)"></i>Compatible, expires within 2 hours</span><span><i class="sw" style="background:#E7E1D3;border:2px solid var(--r)"></i>Not compatible</span></p>`;
+
+const legendHtml = `<div class="row" style="gap:24px;margin:12px 0 20px;font-size:0.88rem;font-weight:600"><span><i class="sw" style="background:var(--g)"></i>Compatible</span><span><i class="sw" style="background:var(--a)"></i>Compatible (expires &lt; 2h)</span><span><i class="sw" style="background:#E7E1D3;border:2px solid var(--r)"></i>Incompatible / Capacity block</span></div>`;
+
 function sortFilter(items) {
   let l = items.filter(i => (!flt.cat || i.cat === flt.cat) && (!flt.ok || i.ok));
-  const k = { distance: (a, b) => a.km - b.km, urgency: (a, b) => a.exp - b.exp, quantity: (a, b) => b.qty - a.qty, compatibility: (a, b) => (b.ok - a.ok) || a.km - b.km }[flt.sort]; return l.sort(k);
+  const k = { distance: (a, b) => a.km - b.km, urgency: (a, b) => a.exp - b.exp, quantity: (a, b) => b.qty - a.qty, compatibility: (a, b) => (b.ok - a.ok) || a.km - b.km }[flt.sort];
+  return l.sort(k);
 }
-const controls = () => `<div class="row" style="margin:10px 0"><label>Sort<select data-flt="sort">${['distance', 'urgency', 'quantity', 'compatibility'].map(x => `<option ${flt.sort === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label><label>Category<select data-flt="cat"><option value="">All</option>${S.cats.map(x => `<option ${flt.cat === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label><label style="grid-auto-flow:column;align-items:center"><input type="checkbox" data-flt="ok" ${flt.ok ? 'checked' : ''}> Compatible only</label></div>`;
-function emergency() {
-  const me = S.me; if (me.role === 'receiver') {
-    const items = S.donations.filter(d => d.status === 'Available').map(d => { const f = S.fits[d.id + ':' + me.id] || {}, dn = usr(d.donorId); return { id: d.id, name: dn.name, km: f.km, qty: d.remaining, unit: d.unit, cat: d.category, exp: d.expiresAt, mins: f.mins, safety: d.safety, ok: f.ok, why: f.why || [], need: Math.min(d.remaining, (me.needs || {})[d.category] || 0), cls: f.ok ? (d.expiresAt - T() < 72e5 ? 'amber' : 'green') : 'bad' }; });
-    const list = sortFilter(items), cur = list.find(i => i.id === sel);
-    return `<h1 style="font-size:2.2rem">Emergency: nearby donors</h1>${controls()}${legendHtml}<div class="ringwrap">${list.length ? ring(list, me.name) : '<p>No donors match these filters.</p>'}<div>${cur ? detailR(cur) : '<p class="mut">Select a donor on the rings or in the table to see details and request it.</p>'}</div></div><h2 style="font-size:1.4rem;margin-top:28px">All donors</h2><div class="scroll"><table><caption class="mut" style="text-align:left">Same data as the rings, with a button for each donor.</caption><thead><tr><th>Donor</th><th>Distance</th><th>Available</th><th>Category</th><th>Expires in</th><th>Travel</th><th>Safety</th><th>Compatibility</th><th></th></tr></thead><tbody>${list.map(i => `<tr><td>${esc(i.name)}</td><td>${i.km} km</td><td>${i.qty} ${esc(i.unit)}</td><td>${esc(i.cat)}</td><td>${timer(i.exp)}</td><td>${i.mins} min</td><td>${esc(i.safety.join(', ') || 'None')}</td><td>${i.ok ? chip('Compatible') : chip('Blocked')}${i.ok ? '' : `<br><small>${esc(i.why.join('; '))}</small>`}</td><td><button class="btn s" data-sel="${i.id}">Inspect</button></td></tr>`).join('')}</tbody></table></div>${list.length ? '' : '<p class="mut">Nothing to show. New donations appear here live.</p>'}`;
-  }
-  const mine = S.donations.filter(d => d.donorId === me.id && d.status === 'Available'); if (!mine.length) return '<h1 style="font-size:2.2rem">Emergency: nearby receivers</h1><p>Post an available donation first, then inspect which receivers can take it.</p>';
-  const d = mine.find(x => x.id === sel2) || mine[0];
-  const items = S.users.filter(u => u.role === 'receiver').map(r => { const f = S.fits[d.id + ':' + r.id] || {}, need = (r.needs || {})[d.category] || 0; return { id: r.id, name: r.name, km: f.km, qty: need, cat: d.category, exp: d.expiresAt, ok: f.ok, why: f.why || [], r, cls: f.ok ? 'green' : 'bad', demand: Object.values(r.needs || {}).reduce((a, b) => a + b, 0) }; });
-  const list = sortFilter(items), cur = list.find(i => i.id === sel);
-  return `<h1 style="font-size:2.2rem">Emergency: nearby receivers</h1><label style="max-width:420px">Donation to offer<select data-sel2>${mine.map(x => `<option value="${x.id}" ${x.id === d.id ? 'selected' : ''}>${esc(x.category)}, ${x.remaining} ${esc(x.unit)}</option>`).join('')}</select></label>${controls()}${legendHtml}<div class="ringwrap">${ring(list, S.me.name)}<div>${cur ? `<div class="card"><h3>${esc(cur.name)}</h3><p>${cur.km} km away. Needs ${cur.qty} ${esc(d.unit)} of ${esc(d.category)}. Total demand ${cur.demand}. Capacity ${cur.r.capacity}, occupancy ${cur.r.occupancy}. Receiving ${cur.r.hours?.join(' to ')}h. ${cur.ok ? chip('Compatible') : chip('Blocked: ' + cur.why.join('; '))}</p><button class="btn p" data-act="offer" data-id="${d.id}" data-to="${cur.id}" ${cur.ok ? '' : 'disabled'}>Offer this donation</button></div>` : '<p class="mut">Select a receiver to inspect it.</p>'}</div></div><div class="scroll"><table><thead><tr><th>Receiver</th><th>Distance</th><th>Needs</th><th>Capacity</th><th>Demand</th><th>Compatibility</th><th></th></tr></thead><tbody>${list.map(i => `<tr><td>${esc(i.name)}</td><td>${i.km} km</td><td>${i.qty} ${esc(d.unit)}</td><td>${i.r.occupancy}/${i.r.capacity}</td><td>${i.demand}</td><td>${i.ok ? chip('Compatible') : chip('Blocked')}</td><td><button class="btn s" data-sel="${i.id}">Inspect</button></td></tr>`).join('')}</tbody></table></div>`;
-}
-const detailR = i => `<div class="card"><h3>${esc(i.name)}</h3><p>${i.km} km, about ${i.mins} min travel. ${i.qty} ${esc(i.unit)} of ${esc(i.cat)}. Expires in ${timer(i.exp)}.<br>Safety: ${esc(i.safety.join(', ') || 'None')}.<br>${i.ok ? chip('Compatible') : chip('Blocked: ' + i.why.join('; '))}</p>${i.ok ? `<form class="f" data-form="request" data-id="${i.id}" style="grid-template-columns:1fr auto;align-items:end"><label>Quantity (max ${i.need})<input name="qty" type="number" min="1" max="${i.need}" value="${i.need}" required></label><button class="btn p">Request donation</button></form>` : ''}</div>`;
 
-/* ---------- dashboards ---------- */
-const notesBox = () => `<section class="card" aria-label="Notifications"><h3>${ic('bell')}Notifications</h3>${S.notes.length ? S.notes.slice(-6).reverse().map(n => `<div class="note ${n.level}">${esc(n.msg)}<br><small class="mut">${new Date(n.t).toLocaleTimeString()}</small></div>`).join('') : '<p class="mut">No notifications yet.</p>'}</section>`;
+const controls = () => `<div class="row" style="margin:14px 0 10px;gap:18px"><label>Sort<select data-flt="sort">${['distance', 'urgency', 'quantity', 'compatibility'].map(x => `<option ${flt.sort === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label><label>Category<select data-flt="cat"><option value="">All Categories</option>${S.cats.map(x => `<option ${flt.cat === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label><label style="grid-auto-flow:column;align-items:center;font-weight:700"><input type="checkbox" data-flt="ok" ${flt.ok ? 'checked' : ''}> Compatible only</label></div>`;
+
+function emergency() {
+  const me = S.me;
+  if (me.role === 'receiver') {
+    const items = S.donations.filter(d => d.status === 'Available').map(d => {
+      const f = S.fits[d.id + ':' + me.id] || {}, dn = usr(d.donorId);
+      return { id: d.id, name: dn.name, km: f.km, qty: d.remaining, unit: d.unit, cat: d.category, exp: d.expiresAt, mins: f.mins, safety: d.safety, ok: f.ok, why: f.why || [], need: Math.min(d.remaining, (me.needs || {})[d.category] || 0), cls: f.ok ? (d.expiresAt - T() < 72e5 ? 'amber' : 'green') : 'bad' };
+    });
+    const list = sortFilter(items), cur = list.find(i => i.id === sel);
+
+    return `
+      <div class="radar-command-deck">
+        <div class="radar-hud-bar">
+          <div>
+            <span style="font-size:0.75rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange)">Live Corridor Telemetry</span>
+            <div style="font-family:var(--fd);font-weight:700;font-size:1.25rem">${esc(me.name)} &bull; Nearby Donors Radar</div>
+          </div>
+          <div class="radar-hud-pills">
+            <span class="radar-hud-pill active">&bull; 360&deg; Live Radar Active</span>
+            <span class="radar-hud-pill">${list.length} Donors In Range</span>
+            <span class="radar-hud-pill" style="color:#6BCB77">&bull; ${list.filter(i => i.ok).length} Compatible</span>
+            <span class="radar-hud-pill" style="color:#FFA56E">&bull; ${list.filter(i => i.cls === 'amber').length} Urgent</span>
+          </div>
+        </div>
+
+        ${controls()}
+        ${legendHtml}
+
+        <div class="ringwrap">
+          ${list.length ? ring(list, me.name) : '<div class="card"><p class="mut">No donors match these filters in the immediate corridor.</p></div>'}
+          <div>
+            ${cur ? detailR(cur) : `
+              <div class="radar-inspect-hud">
+                <span class="auth-badge">Inspection HUD</span>
+                <h3 style="font-size:1.35rem;margin:8px 0 6px">Proximity Inspector</h3>
+                <p class="mut" style="line-height:1.5">Click any circular radar node or table row to inspect food safety, travel duration, remaining shelf-life, and dispatch couriers directly to your shelter.</p>
+                <div class="radar-kpi-row">
+                  <div class="radar-kpi-box"><div class="val">${list.length}</div><div class="lbl">Total In Range</div></div>
+                  <div class="radar-kpi-box"><div class="val">${list.filter(i => i.ok).length}</div><div class="lbl">Instant Matches</div></div>
+                </div>
+              </div>
+            `}
+          </div>
+        </div>
+
+        <h2 style="font-size:1.6rem;margin-top:40px">All Available Donors on Corridor</h2>
+        <div class="scroll">
+          <table>
+            <caption class="mut" style="text-align:left;margin-bottom:8px">Live sensor feeds aligned with radar targets. Click Inspect on any row to lock on.</caption>
+            <thead><tr><th>Donor Facility</th><th>Distance</th><th>Batch Surplus</th><th>Category</th><th>Expires in</th><th>Transit Est.</th><th>Safety Specs</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>${list.map(i => `<tr><td><b>${esc(i.name)}</b></td><td>${i.km} km</td><td><b>${i.qty}</b> ${esc(i.unit)}</td><td>${esc(i.cat)}</td><td>${timer(i.exp)}</td><td>${i.mins} min</td><td>${esc(i.safety.join(', ') || 'Standard')}</td><td>${i.ok ? chip('Compatible') : chip('Blocked')}${i.ok ? '' : `<br><small class="mut">${esc(i.why.join('; '))}</small>`}</td><td><button class="btn s ${sel === i.id ? 'p' : ''}" data-sel="${i.id}">Inspect</button></td></tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  const mine = S.donations.filter(d => d.donorId === me.id && d.status === 'Available');
+  if (!mine.length) return `<div class="radar-command-deck"><h1 style="font-size:2.2rem">Emergency: Nearby Receivers</h1><div class="card"><p>Post an available donation first, then inspect which receiving shelters on the corridor have matching capacity and demand.</p></div></div>`;
+  const d = mine.find(x => x.id === sel2) || mine[0];
+  const items = S.users.filter(u => u.role === 'receiver').map(r => {
+    const f = S.fits[d.id + ':' + r.id] || {}, need = (r.needs || {})[d.category] || 0;
+    return { id: r.id, name: r.name, km: f.km, qty: need, cat: d.category, exp: d.expiresAt, ok: f.ok, why: f.why || [], r, cls: f.ok ? 'green' : 'bad', demand: Object.values(r.needs || {}).reduce((a, b) => a + b, 0) };
+  });
+  const list = sortFilter(items), cur = list.find(i => i.id === sel);
+
+  return `
+    <div class="radar-command-deck">
+      <div class="radar-hud-bar">
+        <div>
+          <span style="font-size:0.75rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange)">Live Corridor Telemetry</span>
+          <div style="font-family:var(--fd);font-weight:700;font-size:1.25rem">${esc(me.name)} &bull; Receiving Shelters Radar</div>
+        </div>
+        <div class="radar-hud-pills">
+          <span class="radar-hud-pill active">&bull; 360&deg; Radar Scanning</span>
+          <span class="radar-hud-pill">${list.length} Shelters Monitored</span>
+          <span class="radar-hud-pill" style="color:#6BCB77">&bull; ${list.filter(i => i.ok).length} Compatible</span>
+        </div>
+      </div>
+
+      <div style="margin:16px 0">
+        <label style="max-width:440px;font-weight:700">Donation batch to target<select data-sel2>${mine.map(x => `<option value="${x.id}" ${x.id === d.id ? 'selected' : ''}>${esc(x.category)}, ${x.remaining} ${esc(x.unit)}</option>`).join('')}</select></label>
+      </div>
+
+      ${controls()}
+      ${legendHtml}
+
+      <div class="ringwrap">
+        ${ring(list, S.me.name)}
+        <div>
+          ${cur ? `
+            <div class="radar-inspect-hud">
+              <span class="auth-badge">Shelter Target Locked</span>
+              <h3 style="font-size:1.4rem;margin:8px 0 4px">${esc(cur.name)}</h3>
+              <p class="mut" style="margin:0 0 16px">${cur.km} km away &bull; Receiving hours ${cur.r.hours?.join(' to ')}h</p>
+              <div class="radar-kpi-row">
+                <div class="radar-kpi-box"><div class="val">${cur.qty}</div><div class="lbl">Category Need</div></div>
+                <div class="radar-kpi-box"><div class="val">${cur.r.occupancy}/${cur.r.capacity}</div><div class="lbl">Occupancy</div></div>
+              </div>
+              <p style="margin:12px 0">${cur.ok ? chip('Compatible Match') : chip('Blocked: ' + cur.why.join('; '))}</p>
+              <button class="btn p full" data-act="offer" data-id="${d.id}" data-to="${cur.id}" ${cur.ok ? '' : 'disabled'} style="font-size:1.02rem;padding:12px">Offer Batch to Shelter</button>
+            </div>
+          ` : `
+            <div class="radar-inspect-hud">
+              <span class="auth-badge">Inspection HUD</span>
+              <h3 style="font-size:1.35rem;margin:8px 0 6px">Target Shelter Inspector</h3>
+              <p class="mut" style="line-height:1.5">Click any circular shelter node on the radar to inspect storage compatibility, current bed occupancy, and directly dispatch an allocation offer.</p>
+              <div class="radar-kpi-row">
+                <div class="radar-kpi-box"><div class="val">${list.length}</div><div class="lbl">Shelters in Radius</div></div>
+                <div class="radar-kpi-box"><div class="val">${list.filter(i => i.ok).length}</div><div class="lbl">Ready for Dropoff</div></div>
+              </div>
+            </div>
+          `}
+        </div>
+      </div>
+
+      <h2 style="font-size:1.6rem;margin-top:40px">Nearby Receiving Shelters</h2>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Shelter Facility</th><th>Distance</th><th>Needs This Cat</th><th>Occupancy / Cap</th><th>Total Demand</th><th>Compatibility</th><th>Action</th></tr></thead>
+          <tbody>${list.map(i => `<tr><td><b>${esc(i.name)}</b></td><td>${i.km} km</td><td><b>${i.qty}</b> ${esc(d.unit)}</td><td>${i.r.occupancy}/${i.r.capacity}</td><td>${i.demand}</td><td>${i.ok ? chip('Compatible') : chip('Blocked')}</td><td><button class="btn s ${sel === i.id ? 'p' : ''}" data-sel="${i.id}">Inspect</button></td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+const detailR = i => `
+  <div class="radar-inspect-hud">
+    <span class="auth-badge">Facility Target Locked</span>
+    <h3 style="font-size:1.4rem;margin:8px 0 4px">${esc(i.name)}</h3>
+    <p class="mut" style="margin:0 0 16px">${i.km} km away &bull; ~${i.mins} min transit time</p>
+    <div class="radar-kpi-row">
+      <div class="radar-kpi-box"><div class="val">${i.qty}</div><div class="lbl">${esc(i.unit)} Available</div></div>
+      <div class="radar-kpi-box"><div class="val">${timer(i.exp)}</div><div class="lbl">Safe Window</div></div>
+    </div>
+    <p style="margin:10px 0;font-size:0.88rem"><b>Safety:</b> ${esc(i.safety.join(', ') || 'Standard Packaging')}</p>
+    <p style="margin:10px 0">${i.ok ? chip('Compatible') : chip('Blocked: ' + i.why.join('; '))}</p>
+    ${i.ok ? `
+      <form class="f" data-form="request" data-id="${i.id}" style="grid-template-columns:1fr auto;align-items:end;margin-top:16px;gap:12px">
+        <label><span>Request Portions (max ${i.need})</span><input name="qty" type="number" min="1" max="${i.need}" value="${i.need}" required></label>
+        <button class="btn p" style="padding:12px 18px">Request Batch</button>
+      </form>
+    ` : ''}
+  </div>
+`;
+
+/* ---------- dashboards with bold clean hierarchy ---------- */
+const notesBox = () => `<section class="card" aria-label="Notifications"><h3 style="font-family:var(--fd);font-size:1.2rem">${ic('bell')}Notifications</h3>${S.notes.length ? S.notes.slice(-6).reverse().map(n => `<div class="note ${n.level}">${esc(n.msg)}<br><small class="mut">${new Date(n.t).toLocaleTimeString()}</small></div>`).join('') : '<p class="mut">No notifications yet.</p>'}</section>`;
 const tbl = (h, rows, empty) => rows.length ? `<div class="scroll"><table><thead><tr>${h.map(x => `<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : `<p class="mut">${empty}</p>`;
+
 function donorView() {
   const me = S.me, ds = S.donations.filter(d => d.donorId === me.id).sort((a, b) => b.expiresAt - a.expiresAt), pend = S.requests.filter(q => q.status === 'Pending donor approval');
-  const alerts = pend.map(q => { const d = ds.find(x => x.id === q.donationId), r = usr(q.receiverId); return `<div class="alert" role="alert"><b>${ic('alert')}Urgent request from ${esc(r.name)}</b><p>${q.qty} ${esc(d.unit)} of ${esc(d.category)}. Distance ${q.info.km} km, about ${q.info.mins} min delivery, ${q.info.slack >= 0 ? q.info.slack + ' min spare before the safety buffer' : 'expiry not feasible'}. Contact ${esc(r.manager || '')} ${esc(r.phone || '')}. Decide in ${timer(q.expiresAt)}</p><div class="row"><button class="btn p" data-act="respond" data-id="${q.id}" data-v="1">Accept</button><button class="btn d" data-act="respond" data-id="${q.id}" data-v="0">Reject</button></div></div>`; }).join('');
+  const alerts = pend.map(q => {
+    const d = ds.find(x => x.id === q.donationId), r = usr(q.receiverId);
+    return `<div class="alert" role="alert"><b style="font-size:1.05rem;font-family:var(--fd)">${ic('alert')}Urgent request from ${esc(r.name)}</b><p style="margin:8px 0">${q.qty} ${esc(d.unit)} of ${esc(d.category)}. Distance ${q.info.km} km, about ${q.info.mins} min delivery, ${q.info.slack >= 0 ? q.info.slack + ' min spare before safety buffer' : 'expiry not feasible'}. Contact: ${esc(r.manager || '')} (${esc(r.phone || '')}). Decision buffer: ${timer(q.expiresAt)}</p><div class="row"><button class="btn p" data-act="respond" data-id="${q.id}" data-v="1">Accept Request</button><button class="btn d" data-act="respond" data-id="${q.id}" data-v="0">Reject</button></div></div>`;
+  }).join('');
   const riders = S.users.filter(u => u.role === 'rider' && u.donorId === me.id);
-  return `${alerts}<div class="dash"><div><h2>Your donations</h2>${tbl(['Donation', 'Left / total', 'Status', 'Expires in', ''], ds.map(d => [`${esc(d.category)}<br><small class="mut">${esc(d.safety.join(', '))}</small>${S.requests.filter(q => q.donationId === d.id).map(q => `<details><summary>Request from ${esc(usr(q.receiverId).name)}: ${esc(q.status)}</summary>${tl(q)}</details>`).join('')}<details><summary>Timeline</summary>${tl(d)}</details>`, `${d.remaining} / ${d.qty} ${esc(d.unit)}`, chip(d.status), ['Delivered', 'Receiver confirmed', 'Expired', 'Cancelled'].includes(d.status) ? '' : timer(d.expiresAt), ['Available', 'Request pending', 'Accepted', 'Rider assignment pending', 'Rider assigned', 'Receiver confirmation pending'].includes(d.status) ? `<button class="btn s d" data-act="cancelDon" data-id="${d.id}" data-confirm="Cancel this donation?">Cancel</button>` : '']), 'No donations yet. Use the form to post one.')}
-<h2 style="margin-top:32px">Post a donation</h2><form class="f card" data-form="donation"><label>Category<select name="category">${S.cats.map(c => `<option>${c}</option>`).join('')}</select></label><label>Quantity<input name="qty" type="number" min="1" required></label><label>Unit<input name="unit" value="portions" required></label><label>Expires in (minutes)<input name="expiresInMin" type="number" min="1" value="180" required></label><label class="full">Pickup location<input name="pickup" value="${esc(me.address || '')}"></label><label class="full">Packaging information<input name="packaging"></label><fieldset class="full" style="border:1px solid var(--line);border-radius:4px"><legend>Safety requirements</legend>${['Keep hot', 'Refrigerated', 'Needs cooking', 'Sealed packaging', 'Allergen labelled'].map(s => `<label style="display:inline-flex;grid-auto-flow:column;gap:6px;margin-right:14px"><input type="checkbox" name="safety" value="${s}"> ${s}</label>`).join('')}</fieldset><button class="btn p full" style="justify-self:start">Post donation</button></form></div>
-<aside style="display:grid;gap:16px;align-content:start">${notesBox()}<section class="card"><h3>${ic('truck')}Associated riders</h3>${riders.length ? riders.map(r => `<p style="margin:0 0 8px">${esc(r.name)}, ${esc(r.vehicle)}, capacity ${r.cap}<br>${chip(r.verified ? r.status : 'Pending verification')}</p>`).join('') : '<p class="mut">No riders have joined your facility yet.</p>'}</section></aside></div>`;
+
+  return `
+    ${alerts}
+    <div class="dash-kpi-row">
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${ds.filter(d => d.status === 'Available').length}</div>
+        <div class="dash-kpi-lbl">Active Available Batches</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${pend.length}</div>
+        <div class="dash-kpi-lbl">Awaiting Your Approval</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${riders.filter(r => r.verified).length}</div>
+        <div class="dash-kpi-lbl">Verified Facility Riders</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${ds.reduce((acc, d) => acc + (d.qty || 0), 0)}</div>
+        <div class="dash-kpi-lbl">Total Portions Posted</div>
+      </div>
+    </div>
+
+    <div class="dash">
+      <div>
+        <h2 style="font-size:1.6rem">Your Donations</h2>
+        ${tbl(['Donation Batch', 'Remaining / Total', 'Status', 'Expiry Buffer', 'Action'], ds.map(d => [`<b>${esc(d.category)}</b><br><small class="mut">${esc(d.safety.join(', '))}</small>${S.requests.filter(q => q.donationId === d.id).map(q => `<details><summary>Request from ${esc(usr(q.receiverId).name)}: ${esc(q.status)}</summary>${tl(q)}</details>`).join('')}<details><summary>Timeline</summary>${tl(d)}</details>`, `<b>${d.remaining}</b> / ${d.qty} ${esc(d.unit)}`, chip(d.status), ['Delivered', 'Receiver confirmed', 'Expired', 'Cancelled'].includes(d.status) ? '' : timer(d.expiresAt), ['Available', 'Request pending', 'Accepted', 'Rider assignment pending', 'Rider assigned', 'Receiver confirmation pending'].includes(d.status) ? `<button class="btn s d" data-act="cancelDon" data-id="${d.id}" data-confirm="Cancel this donation?">Cancel</button>` : '']), 'No donations posted yet. Use the form below.')}
+        
+        <h2 style="margin-top:36px;font-size:1.6rem">Post a New Surplus Donation</h2>
+        <form class="f card" data-form="donation">
+          <label>Category<select name="category">${S.cats.map(c => `<option>${c}</option>`).join('')}</select></label>
+          <label>Quantity<input name="qty" type="number" min="1" required></label>
+          <label>Unit<input name="unit" value="portions" required></label>
+          <label>Safe Shelf Life (minutes)<input name="expiresInMin" type="number" min="1" value="180" required></label>
+          <label class="full">Pickup Location Address<input name="pickup" value="${esc(me.address || '')}"></label>
+          <label class="full">Packaging Specifications<input name="packaging" placeholder="Sealed thermal boxes, containers..."></label>
+          <fieldset class="full" style="border:1.5px solid var(--line);border-radius:8px;padding:14px">
+            <legend style="font-weight:700;font-size:0.9rem">Safety Requirements</legend>
+            ${['Keep hot', 'Refrigerated', 'Needs cooking', 'Sealed packaging', 'Allergen labelled'].map(s => `<label style="display:inline-flex;grid-auto-flow:column;gap:6px;margin-right:16px;font-weight:600"><input type="checkbox" name="safety" value="${s}"> ${s}</label>`).join('')}
+          </fieldset>
+          <button class="btn p full" style="justify-self:start;font-size:1.02rem;padding:12px 24px;font-weight:700">Post Surplus Batch</button>
+        </form>
+      </div>
+      <aside style="display:grid;gap:20px;align-content:start">
+        ${notesBox()}
+        <section class="card">
+          <h3 style="font-family:var(--fd);font-size:1.2rem">${ic('truck')}Associated Couriers</h3>
+          ${riders.length ? riders.map(r => `<p style="margin:0 0 10px"><b>${esc(r.name)}</b> &bull; ${esc(r.vehicle)}, capacity ${r.cap}<br>${chip(r.verified ? r.status : 'Pending verification')}</p>`).join('') : '<p class="mut">No couriers have registered with your facility yet.</p>'}
+        </section>
+      </aside>
+    </div>
+  `;
 }
+
 function receiverView() {
   const me = S.me, rq = S.requests.slice().reverse();
-  return `<div class="dash"><div><h2>Active requests and deliveries</h2>${rq.length ? rq.map(q => { const d = S.donations.find(x => x.id === q.donationId), as = S.asgs.filter(a => a.requestId === q.id); return `<div class="card" style="margin-bottom:14px"><b>${q.qty} ${esc(d.unit)} of ${esc(d.category)}</b> from ${esc(usr(d.donorId).name)} ${chip(q.status)} ${chip(d.status)}${['Pending donor approval', 'Receiver confirmation pending'].includes(q.status) ? `<p>Time left: ${timer(q.expiresAt)}</p>` : ''}${as.map(a => { const r = usr(a.riderId); return `<p style="margin:6px 0">${ic('truck')}${esc(r.name)}, ${esc(r.vehicle || '')}, ${esc(r.phone || '')}: ${a.qty} ${esc(d.unit)} ${chip(a.status)} <small class="mut">pickup ${a.route.pm} min, delivery ${a.route.dm} min</small></p>`; }).join('')}<div class="row">${q.status === 'Receiver confirmation pending' ? `<button class="btn p" data-act="confirm" data-id="${q.id}">Confirm rider assistance</button>` : ''}${q.status === 'Confirmed' && d.status === 'Delivered' ? `<button class="btn p" data-act="receipt" data-id="${q.id}">Confirm receipt</button>` : ''}</div><details><summary>Timeline</summary>${tl(q)}</details></div>`; }).join('') : '<p class="mut">No requests yet. Open Emergency to find nearby donors.</p>'}
-<h2 style="margin-top:28px">Update current needs</h2><form class="f card" data-form="needs"><label class="full">Demand, for example Cooked meals:40, Dry rations:20<input name="needs" value="${esc(Object.entries(me.needs || {}).map(([k, v]) => k + ':' + v).join(', '))}"></label><label>Occupancy<input name="occupancy" type="number" min="0" value="${me.occupancy}"></label><button class="btn p" style="align-self:end">Save needs</button></form></div>
-<aside style="display:grid;gap:16px;align-content:start"><section class="card"><h3>Needs and capacity</h3>${Object.entries(me.needs || {}).map(([k, v]) => `<p style="margin:0">${esc(k)}: <b>${v}</b></p>`).join('') || '<p class="mut">No current demand.</p>'}<p style="margin:10px 0 0">Occupancy ${me.occupancy} of ${me.capacity}. Water: ${me.water ? 'yes' : 'no'}. Fuel: ${me.fuel ? 'yes' : 'no'}. Storage: ${me.storage}.</p></section>${notesBox()}</aside></div>`;
+
+  return `
+    <div class="dash-kpi-row">
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${Object.values(me.needs || {}).reduce((a, b) => a + b, 0)}</div>
+        <div class="dash-kpi-lbl">Total Demand (Portions)</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${rq.filter(q => ['Confirmed', 'Pending donor approval', 'Receiver confirmation pending'].includes(q.status)).length}</div>
+        <div class="dash-kpi-lbl">In-Flight Relays</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${me.occupancy} / ${me.capacity}</div>
+        <div class="dash-kpi-lbl">Shelter Bed Occupancy</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${rq.filter(q => q.status === 'Completed').length}</div>
+        <div class="dash-kpi-lbl">Completed Relays</div>
+      </div>
+    </div>
+
+    <div class="dash">
+      <div>
+        <h2 style="font-size:1.6rem">Active Requests & Deliveries</h2>
+        ${rq.length ? rq.map(q => {
+          const d = S.donations.find(x => x.id === q.donationId), as = S.asgs.filter(a => a.requestId === q.id);
+          return `
+            <div class="card" style="margin-bottom:16px">
+              <div class="row" style="justify-content:space-between;align-items:flex-start">
+                <div>
+                  <b style="font-size:1.15rem;font-family:var(--fd)">${q.qty} ${esc(d.unit)} of ${esc(d.category)}</b>
+                  <div class="mut" style="font-size:0.85rem">From: ${esc(usr(d.donorId).name)}</div>
+                </div>
+                <div class="row" style="gap:6px">${chip(q.status)} ${chip(d.status)}</div>
+              </div>
+              ${['Pending donor approval', 'Receiver confirmation pending'].includes(q.status) ? `<p style="margin:8px 0;font-weight:700">Approval Timer: ${timer(q.expiresAt)}</p>` : ''}
+              ${as.map(a => {
+                const r = usr(a.riderId);
+                return `<p style="margin:8px 0;background:var(--bg);padding:8px 12px;border-radius:6px;border:1px solid var(--line)">${ic('truck')}<b>${esc(r.name)}</b> (${esc(r.vehicle || 'Vehicle')} - ${esc(r.phone || '')}): Carrying ${a.qty} ${esc(d.unit)} &bull; ${chip(a.status)} <small class="mut">(pickup ${a.route.pm}m, delivery ${a.route.dm}m)</small></p>`;
+              }).join('')}
+              <div class="row" style="margin-top:12px">
+                ${q.status === 'Receiver confirmation pending' ? `<button class="btn p" data-act="confirm" data-id="${q.id}">Confirm Courier Assistance</button>` : ''}
+                ${q.status === 'Confirmed' && d.status === 'Delivered' ? `<button class="btn p" data-act="receipt" data-id="${q.id}">Confirm Delivery Receipt</button>` : ''}
+              </div>
+              <details style="margin-top:10px"><summary>View Route & Handshake Timeline</summary>${tl(q)}</details>
+            </div>
+          `;
+        }).join('') : '<div class="card"><p class="mut">No active requests. Open the Proximity Radar to find donors nearby.</p></div>'}
+
+        <h2 style="margin-top:36px;font-size:1.6rem">Publish Demand & Shelter Capacity</h2>
+        <form class="f card" data-form="needs">
+          <label class="full">Current Category Needs (format: Category:Portions)<input name="needs" value="${esc(Object.entries(me.needs || {}).map(([k, v]) => k + ':' + v).join(', '))}" placeholder="Cooked meals:40, Dry rations:20"></label>
+          <label>Current Bed Occupancy<input name="occupancy" type="number" min="0" value="${me.occupancy}"></label>
+          <button class="btn p" style="align-self:end;font-weight:700">Update Demand Feeds</button>
+        </form>
+      </div>
+      <aside style="display:grid;gap:20px;align-content:start">
+        <section class="card">
+          <h3 style="font-family:var(--fd);font-size:1.2rem">Shelter Readiness</h3>
+          ${Object.entries(me.needs || {}).map(([k, v]) => `<p style="margin:4px 0"><b>${esc(k)}:</b> ${v} portions</p>`).join('') || '<p class="mut">No demand configured.</p>'}
+          <p style="margin:12px 0 0;font-size:0.88rem"><b>Occupancy:</b> ${me.occupancy} of ${me.capacity} residents<br><b>Storage:</b> ${me.storage} &bull; <b>Water:</b> ${me.water ? 'Yes' : 'No'} &bull; <b>Fuel:</b> ${me.fuel ? 'Yes' : 'No'}</p>
+        </section>
+        ${notesBox()}
+      </aside>
+    </div>
+  `;
 }
+
 function riderView() {
   const me = S.me, as = S.asgs.slice().reverse();
   const btn = (a, act, l, c = '') => `<button class="btn s ${c}" data-act="ride" data-id="${a.id}" data-a="${act}">${l}</button>`;
-  return `<div class="dash"><div><h2>Assignments</h2>${as.length ? as.map(a => { const d = S.donations.find(x => x.id === a.donationId), q = S.requests.find(x => x.id === a.requestId), dn = usr(d.donorId), r = usr(q.receiverId); return `<div class="card" style="margin-bottom:14px"><b>Carry ${a.qty} ${esc(d.unit)} of ${esc(d.category)}</b> ${chip(a.status)}<p style="margin:.5em 0">${ic('pin')}Pickup: ${esc(dn.name)}, ${esc(dn.address || '')}<br>${ic('home')}Deliver: ${esc(r.name)}, ${esc(r.address || '')}, ${esc(r.manager || '')} ${esc(r.phone || '')}<br>${ic('route')}Pickup ${a.route.pk} km (${a.route.pm} min), delivery ${a.route.dk} km (${a.route.dm} min)<br>${ic('clock')}Donation expires in ${timer(d.expiresAt)}${a.status === 'Reserved' ? `<br>Accept within ${timer(a.expiresAt)}` : ''}</p><div class="row">${a.status === 'Reserved' ? `<button class="btn p s" data-act="accept" data-id="${a.id}">Accept assignment</button>` : ''}${a.status === 'Dispatched' ? btn(a, 'start', 'Start delivery', 'p') : ''}${a.status === 'In transit' ? btn(a, 'deliver', 'Mark delivered', 'p') + btn(a, 'delay', 'Report delay') : ''}${a.status === 'Delayed' ? btn(a, 'resume', 'Resume') : ''}${['Dispatched', 'In transit', 'Delayed', 'Assigned', 'Awaiting receiver confirmation'].includes(a.status) ? btn(a, 'fail', 'Unable to complete', 'd') : ''}</div><details><summary>Timeline</summary>${tl(a)}</details></div>`; }).join('') : '<p class="mut">No assignments. Stay available to receive one.</p>'}</div>
-<aside style="display:grid;gap:16px;align-content:start"><section class="card"><h3>Your status</h3><p>${chip(me.verified ? me.status : 'Pending verification')} ${me.available ? chip('Available for work') : chip('Unavailable')}</p><p>Capacity ${me.cap} units. Service radius ${me.radius} km. ${esc(me.vehicle || '')}.<br>Location ${(+me.lat).toFixed(4)}, ${(+me.lng).toFixed(4)}</p><button class="btn p s" data-act="toggle">${me.available ? 'Go unavailable' : 'Go available'}</button></section>${notesBox()}</aside></div>`;
+
+  return `
+    <div class="dash-kpi-row">
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${as.filter(a => ['Reserved', 'Assigned', 'Dispatched', 'In transit'].includes(a.status)).length}</div>
+        <div class="dash-kpi-lbl">Active Assignments</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${me.cap}</div>
+        <div class="dash-kpi-lbl">Max Carrying Capacity</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${me.radius} km</div>
+        <div class="dash-kpi-lbl">Dispatch Radius</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val" style="font-size:1.5rem;color:${me.available ? 'var(--success)' : 'var(--mut)'}">${me.available ? 'ONLINE' : 'OFFLINE'}</div>
+        <div class="dash-kpi-lbl">Courier Availability</div>
+      </div>
+    </div>
+
+    <div class="dash">
+      <div>
+        <h2 style="font-size:1.6rem">Your Route Assignments</h2>
+        ${as.length ? as.map(a => {
+          const d = S.donations.find(x => x.id === a.donationId), q = S.requests.find(x => x.id === a.requestId), dn = usr(d.donorId), r = usr(q.receiverId);
+          return `
+            <div class="card" style="margin-bottom:16px">
+              <div class="row" style="justify-content:space-between;align-items:flex-start">
+                <b style="font-size:1.15rem;font-family:var(--fd)">Carry ${a.qty} ${esc(d.unit)} of ${esc(d.category)}</b>
+                ${chip(a.status)}
+              </div>
+              <p style="margin:10px 0;line-height:1.6">
+                ${ic('pin')}<b>Pickup:</b> ${esc(dn.name)}, ${esc(dn.address || '')}<br>
+                ${ic('home')}<b>Deliver:</b> ${esc(r.name)}, ${esc(r.address || '')} (Contact: ${esc(r.manager || '')} ${esc(r.phone || '')})<br>
+                ${ic('route')}<b>Route:</b> Pickup ${a.route.pk} km (${a.route.pm}m) &bull; Delivery ${a.route.dk} km (${a.route.dm}m)<br>
+                ${ic('clock')}<b>Expiry:</b> ${timer(d.expiresAt)}${a.status === 'Reserved' ? `<br><b>Accept within:</b> ${timer(a.expiresAt)}` : ''}
+              </p>
+              <div class="row" style="gap:8px">
+                ${a.status === 'Reserved' ? `<button class="btn p s" data-act="accept" data-id="${a.id}">Accept Assignment</button>` : ''}
+                ${a.status === 'Dispatched' ? btn(a, 'start', 'Start Delivery Run', 'p') : ''}
+                ${a.status === 'In transit' ? btn(a, 'deliver', 'Confirm Delivery', 'p') + btn(a, 'delay', 'Report Traffic Delay') : ''}
+                ${a.status === 'Delayed' ? btn(a, 'resume', 'Resume Transit') : ''}
+                ${['Dispatched', 'In transit', 'Delayed', 'Assigned', 'Awaiting receiver confirmation'].includes(a.status) ? btn(a, 'fail', 'Unable to Complete', 'd') : ''}
+              </div>
+              <details style="margin-top:10px"><summary>Assignment Audit Timeline</summary>${tl(a)}</details>
+            </div>
+          `;
+        }).join('') : '<div class="card"><p class="mut">No active delivery assignments. Keep your status Online to receive automated route matches.</p></div>'}
+      </div>
+      <aside style="display:grid;gap:20px;align-content:start">
+        <section class="card">
+          <h3 style="font-family:var(--fd);font-size:1.2rem">Courier Profile</h3>
+          <p>${chip(me.verified ? me.status : 'Pending verification')} ${me.available ? chip('Available') : chip('Unavailable')}</p>
+          <p style="margin:8px 0;line-height:1.5"><b>Vehicle:</b> ${esc(me.vehicle || 'Standard')}<br><b>Capacity:</b> ${me.cap} units<br><b>GPS Base:</b> ${(+me.lat).toFixed(4)}, ${(+me.lng).toFixed(4)}</p>
+          <button class="btn p s full" data-act="toggle">${me.available ? 'Set Status: Offline' : 'Set Status: Available'}</button>
+        </section>
+        ${notesBox()}
+      </aside>
+    </div>
+  `;
 }
+
 function adminView() {
   const ds = S.donations, rq = S.requests, as = S.asgs, now = T();
   const urgent = ds.filter(d => ['Available', 'Request pending', 'Accepted', 'Rider assignment pending', 'Rider assigned', 'Receiver confirmation pending'].includes(d.status) && d.expiresAt - now < 72e5);
   const closed = rq.filter(q => ['Completed', 'Cancelled', 'Timed out', 'Rejected', 'Reassigned'].includes(q.status)), done = rq.filter(q => q.status === 'Completed');
-  const rate = closed.length ? Math.round(done.length / closed.length * 100) + '%' : 'No closed requests yet';
-  const dtab = list => tbl(['Donation', 'Donor', 'Status', 'Expires in', ''], list.map(d => [esc(d.category) + ' ' + d.remaining + '/' + d.qty, esc(usr(d.donorId).name), chip(d.status), timer(d.expiresAt), `<button class="btn s" data-act="ov" data-a="expire" data-id="${d.id}" data-confirm="Force expire this donation?">Expire</button> <button class="btn s d" data-act="ov" data-a="cancel" data-id="${d.id}" data-confirm="Cancel this donation?">Cancel</button>`]), 'None right now.');
-  return `<div class="grid" style="margin-bottom:24px">${[['Donations', ds.length], ['Open requests', rq.filter(q => ['Pending donor approval', 'Receiver confirmation pending'].includes(q.status)).length], ['Completed deliveries', done.length], ['Completion rate', rate]].map(([l, v]) => `<div class="card">${typeof v === 'number' ? `<div class="stat" data-count="${v}" data-key="${l}">0</div>` : `<div class="stat">${v}</div>`}${l}</div>`).join('')}</div>
-<h2>Urgent and near expiry</h2>${dtab(urgent)}<h2 style="margin-top:28px">Pending donor requests</h2>${tbl(['Receiver', 'Qty', 'Time left'], rq.filter(q => q.status === 'Pending donor approval').map(q => [esc(usr(q.receiverId).name), q.qty, timer(q.expiresAt)]), 'None right now.')}
-<h2 style="margin-top:28px">Pending receiver confirmations</h2>${tbl(['Receiver', 'Qty', 'Time left'], rq.filter(q => q.status === 'Receiver confirmation pending').map(q => [esc(usr(q.receiverId).name), q.qty, timer(q.expiresAt)]), 'None right now.')}
-<h2 style="margin-top:28px">Active deliveries</h2>${tbl(['Rider', 'Qty', 'Status', 'To'], as.filter(a => ['Dispatched', 'In transit', 'Delayed'].includes(a.status)).map(a => [esc(usr(a.riderId).name), a.qty, chip(a.status), esc(usr(rq.find(q => q.id === a.requestId).receiverId).name)]), 'No deliveries in progress.')}
-<h2 style="margin-top:28px">Failed or delayed riders</h2>${tbl(['Rider', 'Status'], S.users.filter(u => u.role === 'rider' && (['Failed', 'Delayed'].includes(u.status) || !u.available)).map(u => [esc(u.name), chip(u.status)]), 'None right now.')}
-<h2 style="margin-top:28px">Reassignments</h2>${tbl(['Request', 'Reason', 'When'], rq.filter(q => q.status === 'Reassigned').map(q => [q.id, esc(q.tl[q.tl.length - 1].why), new Date(q.tl[q.tl.length - 1].t).toLocaleTimeString()]), 'None yet.')}
-<h2 style="margin-top:28px">Users and facilities</h2>${tbl(['Name', 'Role', 'Status', ''], S.users.filter(u => u.role !== 'admin').map(u => [esc(u.name), u.role, chip(u.role === 'rider' ? (u.verified ? u.status : 'Pending verification') : u.active === false ? 'Unavailable' : 'Active'), (u.role === 'rider' && !u.verified ? `<button class="btn s p" data-act="ov" data-a="verify" data-id="${u.id}">Verify</button> ` : '') + (u.role !== 'donor' ? `<button class="btn s" data-act="ov" data-a="toggle" data-id="${u.id}" data-confirm="Change availability for ${esc(u.name)}?">Toggle availability</button>` : '')]), '')}
-<h2 style="margin-top:28px">Event and audit log</h2>${tbl(['Time', 'Record', 'Status', 'Reason'], S.events.slice(0, 40).map(e => [new Date(e.t).toLocaleTimeString(), e.k, chip(e.s), esc(e.why)]), 'No events.')}`;
+  const rate = closed.length ? Math.round(done.length / closed.length * 100) + '%' : '100%';
+  const dtab = list => tbl(['Donation', 'Donor', 'Status', 'Expiry Buffer', 'Admin Action'], list.map(d => [esc(d.category) + ' ' + d.remaining + '/' + d.qty, esc(usr(d.donorId).name), chip(d.status), timer(d.expiresAt), `<button class="btn s" data-act="ov" data-a="expire" data-id="${d.id}" data-confirm="Force expire this donation?">Expire</button> <button class="btn s d" data-act="ov" data-a="cancel" data-id="${d.id}" data-confirm="Cancel this donation?">Cancel</button>`]), 'No items currently.');
+
+  return `
+    <div class="dash-kpi-row">
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${ds.length}</div>
+        <div class="dash-kpi-lbl">Total Surplus Batches</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${rq.filter(q => ['Pending donor approval', 'Receiver confirmation pending'].includes(q.status)).length}</div>
+        <div class="dash-kpi-lbl">Active Decision Holds</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${done.length}</div>
+        <div class="dash-kpi-lbl">Completed Relays</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-val">${rate}</div>
+        <div class="dash-kpi-lbl">Network Success Rate</div>
+      </div>
+    </div>
+
+    <h2 style="font-size:1.6rem">Urgent &amp; Near-Expiry Batches</h2>${dtab(urgent)}
+    <h2 style="margin-top:36px;font-size:1.6rem">Pending Donor Requests</h2>${tbl(['Shelter', 'Requested Qty', 'Decision Buffer'], rq.filter(q => q.status === 'Pending donor approval').map(q => [esc(usr(q.receiverId).name), q.qty, timer(q.expiresAt)]), 'None right now.')}
+    <h2 style="margin-top:36px;font-size:1.6rem">Active Courier Deliveries</h2>${tbl(['Courier', 'Carried Qty', 'Transit Status', 'Target Shelter'], as.filter(a => ['Dispatched', 'In transit', 'Delayed'].includes(a.status)).map(a => [esc(usr(a.riderId).name), a.qty, chip(a.status), esc(usr(rq.find(q => q.id === a.requestId).receiverId).name)]), 'No deliveries in progress.')}
+    <h2 style="margin-top:36px;font-size:1.6rem">Participating Facilities &amp; Couriers</h2>${tbl(['Name', 'Corridor Role', 'Operational Status', 'Administrative Control'], S.users.filter(u => u.role !== 'admin').map(u => [esc(u.name), u.role, chip(u.role === 'rider' ? (u.verified ? u.status : 'Pending verification') : u.active === false ? 'Unavailable' : 'Active'), (u.role === 'rider' && !u.verified ? `<button class="btn s p" data-act="ov" data-a="verify" data-id="${u.id}">Verify</button> ` : '') + (u.role !== 'donor' ? `<button class="btn s" data-act="ov" data-a="toggle" data-id="${u.id}" data-confirm="Change availability for ${esc(u.name)}?">Toggle Status</button>` : '')]), '')}
+    <h2 style="margin-top:36px;font-size:1.6rem">Live System Audit Log</h2>${tbl(['Timestamp', 'Entity', 'Status Handshake', 'Reason / Trigger'], S.events.slice(0, 40).map(e => [new Date(e.t).toLocaleTimeString(), e.k, chip(e.s), esc(e.why)]), 'No events recorded.')}
+  `;
 }
+
 function lab() {
   const dn = ds => ds.map(d => `<option value="${d.id}">${esc(d.category)} ${d.id} (${d.status})</option>`).join('');
   const sim = (type, label, opts, extra = '') => `<form class="card f" data-form="sim" data-type="${type}" style="grid-template-columns:1fr auto;align-items:end"><label>${label}<select name="id">${opts || '<option value="">Nothing to target</option>'}${extra}</select></label><button class="btn">Run</button></form>`;
@@ -425,10 +903,10 @@ function profile() {
 }
 function shell(h) {
   const r = S.me.role, bell = S.notes.filter(n => n.level === 'urgent').length;
-  const nav = `<header class="top"><div class="wrap"><a class="logo" href="#/app">${BRAND}</a><a class="l" href="#/app">Dashboard</a>${r === 'receiver' ? `<a class="btn d s" href="#/app/emergency">${ic('alert')}Emergency</a>` : r === 'donor' ? '<a class="l" href="#/app/emergency">Emergency</a>' : ''}${r === 'admin' ? '<a class="l" href="#/app/lab">Simulation Lab</a>' : ''}${r !== 'admin' ? '<a class="l" href="#/app/profile">Profile</a>' : ''}<button class="l" data-act="sound" aria-pressed="${sound}">${sound ? 'Sound alerts on' : 'Enable sound alerts'}</button><span class="chip" title="Urgent notifications">${ic('bell')}${bell}</span><span class="mut">${esc(S.me.name)}</span><button class="btn s" data-act="logout">Log out</button></div></header>`;
+  const nav = `<header class="top"><div class="wrap"><a class="logo" href="#/app">${BRAND}</a><a class="l" href="#/app">Dashboard</a>${r === 'receiver' ? `<a class="btn d s" href="#/app/emergency">${ic('alert')}Emergency Radar</a>` : r === 'donor' ? '<a class="l" href="#/app/emergency">Emergency Radar</a>' : ''}${r === 'admin' ? '<a class="l" href="#/app/lab">Simulation Lab</a>' : ''}${r !== 'admin' ? '<a class="l" href="#/app/profile">Profile</a>' : ''}<button class="l" data-act="sound" aria-pressed="${sound}">${sound ? 'Sound alerts on' : 'Enable sound alerts'}</button><span class="chip" title="Urgent notifications">${ic('bell')}${bell}</span><span class="mut" style="font-weight:700">${esc(S.me.name)}</span><button class="btn s" data-act="logout">Log out</button></div></header>`;
   let body = h === 'app/emergency' && r !== 'rider' && r !== 'admin' ? emergency() : h === 'app/profile' && r !== 'admin' ? profile() : h === 'app/lab' && r === 'admin' ? lab() : { donor: donorView, receiver: receiverView, rider: riderView, admin: adminView }[r]();
-  const title = { donor: 'Donor dashboard', receiver: 'Receiver dashboard', rider: 'Rider dashboard', admin: 'Admin dashboard' }[r];
-  return nav + `<main id="main" class="wrap pg">${h === 'app' ? `<h1 style="font-size:2.2rem">${title}</h1>` : ''}${body}</main>`;
+  const title = { donor: 'Donor Dispatch Dashboard', receiver: 'Receiver Shelter Dashboard', rider: 'Courier Logistics Dashboard', admin: 'Platform Administration Console' }[r];
+  return nav + `<main id="main" class="wrap pg">${h === 'app' ? `<h1 style="font-size:2.4rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:24px">${title}</h1>` : ''}${body}</main>`;
 }
 function render(force) {
   const a = document.activeElement;
@@ -444,20 +922,10 @@ function render(force) {
   }
 }
 addEventListener('hashchange', () => {
-  const wipe = document.getElementById('page-transition-wipe');
-  if (wipe) {
-    wipe.className = 'wiping-in';
-    setTimeout(() => {
-      sel = null;
-      render(true);
-      scrollTo(0, 0);
-      if (location.hash.startsWith('#/app') && TOK && !S) refresh();
-      wipe.className = 'wiping-out';
-      setTimeout(() => { wipe.className = ''; }, 250);
-    }, 200);
-  } else {
-    sel = null; render(true); scrollTo(0, 0); if (location.hash.startsWith('#/app') && TOK && !S) refresh();
-  }
+  sel = null;
+  render(true);
+  scrollTo(0, 0);
+  if (location.hash.startsWith('#/app') && TOK && !S) refresh();
 });
 document.addEventListener('focusout', () => setTimeout(() => { if (dirty && !document.activeElement.closest?.('form')) render(); }, 50));
 setInterval(() => document.querySelectorAll('[data-exp]').forEach(e => { const v = +e.dataset.exp; e.textContent = cd(v); e.classList.toggle('low', v - T() < 60000); }), 500);

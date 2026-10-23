@@ -213,8 +213,8 @@
     function renderLoop() {
       if (storyCompleted) return;
 
-      // Clean responsive lerp
-      const lerpFactor = 0.12;
+      // Clean responsive non-sticky scrub
+      const lerpFactor = 0.22;
       smoothedProgress += (targetProgress - smoothedProgress) * lerpFactor;
 
       // One-way lock: once animation is done, hero opens permanently and story is closed
@@ -619,10 +619,11 @@
   function initLenis() {
     if (typeof window.Lenis !== 'undefined') {
       lenisInstance = new window.Lenis({
-        duration: 1.1,
+        duration: 0.82,
         easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         orientation: 'vertical',
-        smoothWheel: true
+        smoothWheel: true,
+        wheelMultiplier: 1.1
       });
       window.lenisInstance = lenisInstance;
 

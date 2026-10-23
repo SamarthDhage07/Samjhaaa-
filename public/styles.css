@@ -243,10 +243,10 @@ a:hover { color: var(--orange-dark); }
   font-variant-numeric: tabular-nums;
 }
 
-/* Pinned Scroll Container (700vh) */
+/* Pinned Scroll Container (350vh for crisp non-sticky story progression) */
 .story-scroll-wrapper {
   position: relative;
-  height: 700vh;
+  height: 350vh;
   background: var(--ivory);
 }
 .story-scroll-wrapper.completed {
@@ -902,31 +902,13 @@ a:hover { color: var(--orange-dark); }
   .custom-cursor-dot, .custom-cursor-ring { display: none !important; }
 }
 
-/* Page Transition Orange Wipe */
-#page-transition-wipe {
-  position: fixed;
-  inset: 0;
-  background: var(--orange);
-  z-index: 10000;
-  transform: scaleY(0);
-  transform-origin: bottom center;
-  pointer-events: none;
+/* Clean, Snappy Page Transition */
+#app.enter {
+  animation: pageFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
-#page-transition-wipe.wiping-in {
-  transform-origin: bottom center;
-  animation: wipeIn 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-#page-transition-wipe.wiping-out {
-  transform-origin: top center;
-  animation: wipeOut 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-@keyframes wipeIn {
-  from { transform: scaleY(0); }
-  to { transform: scaleY(1); }
-}
-@keyframes wipeOut {
-  from { transform: scaleY(1); }
-  to { transform: scaleY(0); }
+@keyframes pageFadeIn {
+  from { opacity: 0.85; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Scroll reveal helper */
@@ -1037,21 +1019,421 @@ input:focus, select:focus, textarea:focus {
 .note.urgent { border-color: var(--danger); background: #FFF5F3; }
 .note.warn { border-color: var(--amber); background: #FEF9EE; }
 
-/* Radar Map on Emergency Dashboard */
-.ringwrap { display: grid; grid-template-columns: minmax(320px, 1fr) 1fr; gap: 28px; }
-.ringsvg { width: 100%; height: auto; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
-.rg { fill: none; stroke: var(--line); stroke-dasharray: 3 4; }
-.rl { font-size: 10px; fill: var(--mut); font-family: var(--fb); }
-.ctr { fill: var(--ink); }
-.ctl { font: 700 11px var(--fb); fill: var(--ink); }
-.dot { cursor: pointer; }
-.dot circle { fill: var(--orange); fill-opacity: 0.9; stroke: var(--bg); stroke-width: 2.5; transition: fill-opacity 0.2s; }
-.dot:hover circle { fill-opacity: 1; stroke: var(--ink); }
-.dot text { font: 600 10px var(--fb); fill: var(--ink); }
-.dot .sub { fill: var(--mut); font-size: 9px; }
-.dot.amber circle { fill: var(--amber); }
-.dot.bad circle { fill: #EAE3D5; stroke: var(--danger); stroke-width: 2.5; }
-.dot.sel circle { stroke: var(--ink); stroke-width: 3.5; }
+/* =====================================================================
+   AUTH & LOGIN EXPERIENCE (CLEAN 2-COLUMN SPLIT WITH PERSONA SWITCHER)
+   ===================================================================== */
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1.15fr;
+  gap: 36px;
+  align-items: start;
+  margin: 32px 0 60px;
+}
+.auth-card {
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 36px;
+  box-shadow: 0 8px 30px rgba(30, 27, 24, 0.06);
+}
+.auth-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--orange);
+  background: var(--orange-light);
+  border: 1px solid rgba(194, 87, 26, 0.25);
+  padding: 4px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.auth-title {
+  font: 800 2.4rem var(--fd);
+  color: var(--ink);
+  letter-spacing: -0.025em;
+  margin: 0 0 10px;
+}
+.auth-subtitle {
+  color: var(--mut);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.auth-form label span {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+.auth-footer-links {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-light);
+}
+
+.auth-demo-card {
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 8px 30px rgba(30, 27, 24, 0.06);
+}
+.auth-demo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-light);
+}
+.persona-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.persona-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.persona-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--orange);
+  background: var(--bg);
+  box-shadow: 0 6px 18px rgba(194, 87, 26, 0.12);
+}
+.persona-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--orange-light);
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.persona-info { flex: 1; }
+.persona-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+.persona-role {
+  font-weight: 800;
+  font-size: 0.76rem;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.persona-action {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+  opacity: 0.7;
+}
+.persona-item:hover .persona-action {
+  color: var(--orange);
+  opacity: 1;
+}
+.persona-name {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--ink);
+  font-family: var(--fd);
+}
+.persona-desc {
+  font-size: 0.82rem;
+  color: var(--mut);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.auth-others-section {
+  padding-top: 16px;
+  border-top: 1px solid var(--line-light);
+}
+.persona-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.persona-chip-btn {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.persona-chip-btn:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: #FFFFFF;
+}
+
+/* =====================================================================
+   EXPANSIVE RADAR COMMAND DECK & CIRCULAR MULTIPLE OBJECT SCREEN
+   ===================================================================== */
+.radar-command-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+.radar-hud-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--ink);
+  color: #FAF6EF;
+  padding: 14px 22px;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(30, 27, 24, 0.18);
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.radar-hud-pills {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.radar-hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #FAF6EF;
+}
+.radar-hud-pill.active {
+  background: rgba(194, 87, 26, 0.35);
+  border: 1px solid var(--orange);
+  color: #FFA56E;
+}
+
+.ringwrap {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+.ringsvg-container {
+  position: relative;
+  width: 100%;
+  background: #FFFFFF;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(30, 27, 24, 0.06);
+  overflow: hidden;
+}
+.ringsvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Radar SVG Elements & Sweeping 360 Animation */
+.radar-sweep-pivot {
+  animation: spinRadar 6s linear infinite;
+  transform-box: fill-box;
+}
+@keyframes spinRadar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.radar-grid-ring {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 6;
+}
+.radar-tag-bg {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.radar-crosshair {
+  stroke: var(--line-light);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+.radar-center-pulse {
+  fill: none;
+  stroke: var(--orange);
+  stroke-width: 2;
+  animation: centerPulse 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes centerPulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+.radar-center-dot {
+  fill: var(--ink);
+  stroke: #FAF6EF;
+  stroke-width: 3;
+}
+
+/* Radar Multiple Interactive Circular Nodes */
+.radar-node {
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.radar-node:hover {
+  transform: scale(1.18);
+}
+.radar-node:focus-visible {
+  outline: none;
+}
+.radar-node.sel {
+  transform: scale(1.15);
+}
+.radar-node .radar-halo {
+  fill: var(--orange-glow);
+  animation: haloBreath 2s infinite ease-in-out;
+}
+@keyframes haloBreath {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+.radar-node .radar-core {
+  fill: var(--orange);
+  stroke: #FFFFFF;
+  stroke-width: 3;
+  transition: fill 0.2s, stroke 0.2s;
+}
+.radar-node:hover .radar-core {
+  stroke: var(--ink);
+  stroke-width: 3.5;
+}
+.radar-node.amber .radar-core { fill: var(--amber); }
+.radar-node.bad .radar-core { fill: #D7CEBF; stroke: var(--danger); }
+.radar-node.sel .radar-core {
+  fill: var(--orange);
+  stroke: var(--ink);
+  stroke-width: 4;
+}
+.radar-label-badge {
+  fill: rgba(250, 246, 239, 0.96);
+  stroke: var(--line);
+  stroke-width: 1;
+  filter: drop-shadow(0 2px 6px rgba(30, 27, 24, 0.12));
+}
+.radar-node:hover .radar-label-badge {
+  fill: #FFFFFF;
+  stroke: var(--orange);
+}
+.radar-node .node-title {
+  font-family: var(--fb);
+  font-weight: 800;
+  font-size: 11px;
+  fill: var(--ink);
+}
+.radar-node .node-sub {
+  font-family: var(--fb);
+  font-weight: 600;
+  font-size: 9.5px;
+  fill: var(--mut);
+}
+
+/* Radar Inspection HUD Panel */
+.radar-inspect-hud {
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 8px 30px rgba(30, 27, 24, 0.06);
+}
+.radar-inspect-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-light);
+}
+.radar-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 18px 0;
+}
+.radar-kpi-box {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.radar-kpi-box .val {
+  font-family: var(--fd);
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: var(--ink);
+}
+.radar-kpi-box .lbl {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--mut);
+  text-transform: uppercase;
+}
+
+/* =====================================================================
+   DASHBOARD CLEAN ENHANCEMENTS & BOLD STATS
+   ===================================================================== */
+.dash-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+.dash-kpi-card {
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 14px rgba(30, 27, 24, 0.04);
+}
+.dash-kpi-val {
+  font: 800 2.2rem var(--fd);
+  color: var(--orange);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.dash-kpi-lbl {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--mut);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 
 /* Toasts */
 #toast {
