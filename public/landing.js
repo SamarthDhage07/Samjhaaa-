@@ -322,6 +322,7 @@
   // 4. Interactive Simulation Map (Section 4)
   function initInteractiveMap() {
     const mapSvg = document.getElementById('hero-map-svg');
+    const heroMapBox = document.getElementById('hero-map-box') || document.querySelector('.hero-map-box');
     const instructionTag = document.getElementById('map-instruction');
     const routeLine = document.getElementById('map-route-line');
     const truckIcon = document.getElementById('map-truck');
@@ -329,6 +330,23 @@
     const pinGroup = document.getElementById('map-dynamic-pin');
 
     if (!mapSvg || !routeLine || !truckIcon || !checkIcon) return;
+
+    // Interactive 3D Perspective Gyroscope Tilt
+    const heroMapStage = heroMapBox ? heroMapBox.closest('.hero-map-stage') : null;
+    if (heroMapBox && heroMapStage) {
+      heroMapStage.addEventListener('mousemove', e => {
+        const rect = heroMapStage.getBoundingClientRect();
+        const relX = (e.clientX - rect.left) / rect.width;
+        const relY = (e.clientY - rect.top) / rect.height;
+        const rotX = 11 - (relY - 0.5) * 12;
+        const rotY = -8 + (relX - 0.5) * 14;
+        heroMapBox.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateZ(1.2deg)`;
+      }, { passive: true });
+
+      heroMapStage.addEventListener('mouseleave', () => {
+        heroMapBox.style.transform = 'rotateX(11deg) rotateY(-8deg) rotateZ(1.2deg)';
+      });
+    }
 
     // Fixed shelter location on map
     const shelterX = 430;
@@ -346,13 +364,16 @@
 
       if (instructionTag) instructionTag.style.opacity = '0';
 
-      // Drop pin at click location
+      // Drop elevated 3D pin at click location with ground cast shadow
       if (pinGroup) {
         pinGroup.innerHTML = `
           <g class="map-donor-pin">
-            <circle cx="${clickX}" cy="${clickY}" r="9" fill="#C2571A" stroke="#FAF6EF" stroke-width="2.5"/>
-            <circle cx="${clickX}" cy="${clickY}" r="3" fill="#FAF6EF"/>
-            <text x="${clickX}" y="${clickY + 22}" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="11" fill="var(--ink)">Donation</text>
+            <ellipse cx="${clickX}" cy="${clickY + 4}" rx="8" ry="3.5" fill="rgba(30,27,24,0.3)"/>
+            <line x1="${clickX}" y1="${clickY}" x2="${clickX}" y2="${clickY - 14}" stroke="#C2571A" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="${clickX}" cy="${clickY - 14}" r="9" fill="#C2571A" stroke="#FAF6EF" stroke-width="2.5"/>
+            <circle cx="${clickX}" cy="${clickY - 14}" r="3" fill="#FAF6EF"/>
+            <rect x="${clickX - 32}" y="${clickY - 34}" width="64" height="17" rx="4" fill="var(--ink)"/>
+            <text x="${clickX}" y="${clickY - 22}" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="10" fill="#FAF6EF">Donation</text>
           </g>
         `;
       }

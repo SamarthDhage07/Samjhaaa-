@@ -135,49 +135,106 @@ function landing() {
             </div>
           </div>
           
-          <div class="hero-map-box">
-            <div class="hero-map-header">
-              <span>CITY RELAY CORRIDOR</span>
-              <span class="sim-badge">Live simulation</span>
-            </div>
-            <svg id="hero-map-svg" class="hero-map-svg" viewBox="0 0 560 420">
-              <defs>
-                <pattern id="street-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 40" fill="none" class="map-bg-grid" />
-                </pattern>
-              </defs>
-              <rect width="560" height="420" fill="#EAE7E0" />
-              <rect width="560" height="420" fill="url(#street-grid)" />
-              <g id="map-grid-layer">
-                <path class="map-road" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" />
-                <path class="map-road-center" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" />
-              </g>
-              <path id="map-route-line" class="map-route-line" d="M 120 320 L 240 320 L 240 160 L 430 160" />
-              <g transform="translate(430, 160)">
-                <circle r="22" class="map-shelter-pulse" />
-                <circle r="12" class="map-shelter-marker" />
-                <rect x="-6" y="-6" width="12" height="12" fill="#FAF6EF" rx="2" />
-                <text y="28" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="11" fill="var(--ink)">Asha Shelter</text>
-              </g>
-              <g id="map-dynamic-pin">
-                <g class="map-donor-pin">
-                  <circle cx="120" cy="320" r="9" fill="#C2571A" stroke="#FAF6EF" stroke-width="2.5" />
-                  <circle cx="120" cy="320" r="3" fill="#FAF6EF" />
-                  <text x="120" y="342" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="11" fill="var(--ink)">Donation</text>
+          <div class="hero-map-stage">
+            <div class="hero-map-box" id="hero-map-box">
+              <div class="hero-map-header">
+                <span>CITY RELAY CORRIDOR &bull; 3D TACTICAL GRID</span>
+                <span class="sim-badge">Live simulation</span>
+              </div>
+              <svg id="hero-map-svg" class="hero-map-svg" viewBox="0 0 560 420">
+                <defs>
+                  <pattern id="street-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" class="map-bg-grid" />
+                  </pattern>
+                  <filter id="map-3d-shadow" x="-20%" y="-20%" width="150%" height="160%">
+                    <feDropShadow dx="2" dy="6" stdDeviation="3.5" flood-color="#1E1B18" flood-opacity="0.25" />
+                  </filter>
+                  <linearGradient id="route-3d-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#C2571A" />
+                    <stop offset="100%" stop-color="#2A6F97" />
+                  </linearGradient>
+                </defs>
+                <rect width="560" height="420" fill="#EAE7E0" />
+                <rect width="560" height="420" fill="url(#street-grid)" />
+
+                <!-- 3D Isometric Buildings Layer -->
+                <g id="map-3d-buildings" opacity="0.95">
+                  <!-- Block 1 (Top Left) -->
+                  <polygon points="65,115 125,115 140,128 80,128" class="map-3d-bldg-shadow" />
+                  <polygon points="65,75 110,75 110,115 65,115" class="map-3d-bldg-front" />
+                  <polygon points="110,75 125,60 125,100 110,115" class="map-3d-bldg-side" />
+                  <polygon points="65,75 80,60 125,60 110,75" class="map-3d-bldg-top" />
+
+                  <polygon points="145,55 185,55 185,115 145,115" class="map-3d-bldg-front" />
+                  <polygon points="185,55 198,42 198,102 185,115" class="map-3d-bldg-side" />
+                  <polygon points="145,55 158,42 198,42 185,55" class="map-3d-bldg-top" />
+
+                  <!-- Block 2 (Top Center) -->
+                  <polygon points="280,120 335,120 350,132 295,132" class="map-3d-bldg-shadow" />
+                  <polygon points="280,70 330,70 330,120 280,120" class="map-3d-bldg-front" />
+                  <polygon points="330,70 345,55 345,105 330,120" class="map-3d-bldg-side" />
+                  <polygon points="280,70 295,55 345,55 330,70" class="map-3d-bldg-top" />
+
+                  <!-- Block 3 (Bottom Left) -->
+                  <polygon points="60,280 115,280 128,292 73,292" class="map-3d-bldg-shadow" />
+                  <polygon points="60,235 110,235 110,280 60,280" class="map-3d-bldg-front" />
+                  <polygon points="110,235 124,220 124,265 110,280" class="map-3d-bldg-side" />
+                  <polygon points="60,235 74,220 124,220 110,235" class="map-3d-bldg-top" />
+
+                  <!-- Block 4 (Bottom Right) -->
+                  <polygon points="290,285 345,285 358,296 303,296" class="map-3d-bldg-shadow" />
+                  <polygon points="290,240 340,240 340,285 290,285" class="map-3d-bldg-front" />
+                  <polygon points="340,240 354,226 354,271 340,285" class="map-3d-bldg-side" />
+                  <polygon points="290,240 304,226 354,226 340,240" class="map-3d-bldg-top" />
                 </g>
-              </g>
-              <g id="map-truck" class="map-truck-icon" transform="translate(108, 308)">
-                <rect width="24" height="14" rx="3" fill="#C2571A" />
-                <circle cx="6" cy="14" r="3.5" fill="#1E1B18" />
-                <circle cx="18" cy="14" r="3.5" fill="#1E1B18" />
-                <rect x="14" y="2" width="7" height="6" rx="1" fill="#FAF6EF" />
-              </g>
-              <g id="map-check" class="map-check-icon" transform="translate(416, 146)" opacity="0">
-                <circle cx="14" cy="14" r="14" fill="#2F7A52" />
-                <path d="M 8 14 L 12 18 L 20 10" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-              </g>
-            </svg>
-            <div id="map-instruction" class="map-instruction-tag">Click anywhere on the map to test a dispatch</div>
+
+                <g id="map-grid-layer">
+                  <path class="map-road" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" />
+                  <path class="map-road-center" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" />
+                </g>
+
+                <path id="map-route-line" class="map-route-line" d="M 120 320 L 240 320 L 240 160 L 430 160" filter="url(#map-3d-shadow)" stroke="url(#route-3d-grad)" />
+
+                <!-- Elevated 3D Shelter Compound -->
+                <g transform="translate(430, 160)">
+                  <circle r="26" class="map-shelter-pulse" />
+                  <ellipse cx="0" cy="10" rx="20" ry="8" fill="rgba(30,27,24,0.28)" />
+                  <polygon points="-14,-4 14,-4 14,8 -14,8" fill="#1E1B18" stroke="#FAF6EF" stroke-width="1.2" />
+                  <polygon points="-14,-4 0,-16 14,-4" fill="#C2571A" stroke="#FAF6EF" stroke-width="1.2" />
+                  <polygon points="14,-4 22,-11 22,1 14,8" fill="#9C4412" />
+                  <rect x="-4" y="0" width="8" height="8" fill="#FAF6EF" rx="1" />
+                  <rect x="-44" y="24" width="88" height="20" rx="5" fill="var(--ink)" />
+                  <text y="38" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="10" fill="#FAF6EF">Asha Shelter</text>
+                </g>
+
+                <g id="map-dynamic-pin">
+                  <g class="map-donor-pin">
+                    <ellipse cx="120" cy="324" rx="8" ry="3.5" fill="rgba(30,27,24,0.3)"/>
+                    <line x1="120" y1="320" x2="120" y2="306" stroke="#C2571A" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="120" cy="306" r="9" fill="#C2571A" stroke="#FAF6EF" stroke-width="2.5" />
+                    <circle cx="120" cy="306" r="3" fill="#FAF6EF" />
+                    <rect x="88" y="272" width="64" height="17" rx="4" fill="var(--ink)"/>
+                    <text x="120" y="284" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="10" fill="#FAF6EF">Donation</text>
+                  </g>
+                </g>
+
+                <!-- Elevated 3D Courier Icon with Ground Shadow -->
+                <g id="map-truck" class="map-truck-icon" transform="translate(108, 308)">
+                  <ellipse cx="12" cy="18" rx="14" ry="4" fill="rgba(30,27,24,0.32)" />
+                  <rect width="24" height="14" rx="3" fill="#C2571A" />
+                  <circle cx="6" cy="14" r="3.5" fill="#1E1B18" />
+                  <circle cx="18" cy="14" r="3.5" fill="#1E1B18" />
+                  <rect x="14" y="2" width="7" height="6" rx="1" fill="#FAF6EF" />
+                </g>
+
+                <g id="map-check" class="map-check-icon" transform="translate(416, 146)" opacity="0">
+                  <ellipse cx="14" cy="26" rx="12" ry="4" fill="rgba(30,27,24,0.3)" />
+                  <circle cx="14" cy="14" r="14" fill="#2F7A52" />
+                  <path d="M 8 14 L 12 18 L 20 10" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                </g>
+              </svg>
+              <div id="map-instruction" class="map-instruction-tag">Click anywhere on the 3D grid to test a dispatch</div>
+            </div>
           </div>
         </div>
       </div>
