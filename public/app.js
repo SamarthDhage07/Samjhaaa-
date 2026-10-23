@@ -37,8 +37,38 @@ const F = {
 const field = ([k, l, t, o], v = '', req) => `<label>${l}${t === 'select' ? `<select name="${k}">${(o === 'donors' ? (PUB?.donors || []).map(d => [d.id, d.name]) : o.map(x => [x, x])).map(([a, b]) => `<option value="${esc(a)}" ${a == v ? 'selected' : ''}>${esc(b)}</option>`).join('')}</select>` : `<input name="${k}" type="${t || 'text'}" step="any" value="${esc(v)}" ${req ? 'required' : ''} autocomplete="off">`}</label>`;
 
 /* ---------- public pages ---------- */
-function topPub() { return `<header class="top"><div class="wrap"><a class="logo" href="#/">${BRAND}</a><button class="l" data-scroll="how-it-works">How it works</button><button class="l" data-scroll="roles">Roles</button><a class="l" href="#/login">Log in</a><a class="btn p s" href="#/register/donor">Donate surplus</a></div></header>`; }
-function footer() { return `<footer class="foot"><div class="wrap"><div class="row" style="margin-bottom:12px"><a href="#/">Home</a><a href="#/login">Log in</a><a href="#/register/donor">Register</a><a href="#/privacy">Privacy Policy</a><a href="#/terms">Terms and Conditions</a><a href="mailto:contact@surplusrelay.example">contact@surplusrelay.example</a></div><p>${BRAND} is a working prototype. Demo accounts and sample organizations are fictional.</p></div></footer>`; }
+function topPub() { 
+  return `
+    <header class="top">
+      <div class="wrap">
+        <a class="logo" href="#/">${BRAND}</a>
+        <button class="l" data-scroll="how-it-works">How it works</button>
+        <button class="l" data-scroll="roles">Roles</button>
+        <a class="btn d s" href="#/app/emergency" style="gap:5px">${ic('alert')}Emergency Radar</a>
+        ${TOK ? `<a class="l" href="#/app">Dashboard</a>` : `<a class="l" href="#/login">Log in</a>`}
+        <a class="btn p s" href="#/register/donor">Donate surplus</a>
+      </div>
+    </header>
+  `; 
+}
+function footer() { 
+  return `
+    <footer class="foot">
+      <div class="wrap">
+        <div class="row" style="margin-bottom:12px;gap:18px;flex-wrap:wrap">
+          <a href="#/">Home</a>
+          <a href="#/app/emergency">Emergency Radar</a>
+          ${TOK ? `<a href="#/app">Dashboard</a>` : `<a href="#/login">Log in</a>`}
+          <a href="#/register/donor">Donate Surplus</a>
+          <a href="#/privacy">Privacy Policy</a>
+          <a href="#/terms">Terms and Conditions</a>
+          <a href="mailto:contact@surplusrelay.example">contact@surplusrelay.example</a>
+        </div>
+        <p>${BRAND} is a real-time surplus delivery platform. Real-time expiry monitoring, volunteer courier dispatch, and emergency shelter routing.</p>
+      </div>
+    </footer>
+  `; 
+}
 const STEPS = ['Donor posts a surplus donation', 'Receiver requests or is matched with the donation', 'Donor approves the request', 'Rider is assigned', 'Receiver confirms rider assistance', 'Donation is delivered', 'Delivery is confirmed and remaining help is reallocated'];
 function landing() {
   const p = PUB || { items: [], events: [] };
@@ -99,9 +129,10 @@ function landing() {
               <span class="hero-title-line"><span>delivered before it expires.</span></span>
             </h1>
             <p class="hero-subtext">Connecting local kitchens, volunteer riders and shelters in real time with automatic expiry protection.</p>
-            <div class="row">
+            <div class="row" style="gap:10px;margin-bottom:20px;flex-wrap:wrap">
               <a class="btn p" href="#/register/donor">Donate surplus</a>
               <button class="btn" data-scroll="how-it-works">See how it works</button>
+              <a class="btn d" href="#/app/emergency" style="gap:8px">${ic('alert')}Emergency Radar</a>
               <button class="btn s" id="btn-replay-story" type="button" style="border-color:var(--line);color:var(--mut)">Replay intro</button>
             </div>
             
@@ -138,102 +169,261 @@ function landing() {
           <div class="hero-map-stage">
             <div class="hero-map-box" id="hero-map-box">
               <div class="hero-map-header">
-                <span>CITY RELAY CORRIDOR &bull; 3D TACTICAL GRID</span>
+                <span>ORBITAL CORRIDOR RECON &bull; 3D SATELLITE MODEL</span>
                 <span class="sim-badge">Live simulation</span>
               </div>
               <svg id="hero-map-svg" class="hero-map-svg" viewBox="0 0 560 420">
                 <defs>
-                  <pattern id="street-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" class="map-bg-grid" />
-                  </pattern>
-                  <filter id="map-3d-shadow" x="-20%" y="-20%" width="150%" height="160%">
-                    <feDropShadow dx="2" dy="6" stdDeviation="3.5" flood-color="#1E1B18" flood-opacity="0.25" />
-                  </filter>
-                  <linearGradient id="route-3d-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#C2571A" />
-                    <stop offset="100%" stop-color="#2A6F97" />
+                  <!-- Satellite Water & Depth Gradient -->
+                  <linearGradient id="sat-river-grad" x1="0%" y1="0%" x2="100%" y2="80%">
+                    <stop offset="0%" stop-color="#023E8A" />
+                    <stop offset="35%" stop-color="#0077B6" />
+                    <stop offset="70%" stop-color="#0096C7" />
+                    <stop offset="100%" stop-color="#48CAE4" />
                   </linearGradient>
+
+                  <!-- Photovoltaic Solar Rooftop Gradient -->
+                  <linearGradient id="sat-solar-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#0F172A" />
+                    <stop offset="40%" stop-color="#1E3A8A" />
+                    <stop offset="100%" stop-color="#0284C7" />
+                  </linearGradient>
+
+                  <!-- Dynamic Courier Neon Vector -->
+                  <linearGradient id="route-neon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FF5722" />
+                    <stop offset="50%" stop-color="#F59E0B" />
+                    <stop offset="100%" stop-color="#10B981" />
+                  </linearGradient>
+
+                  <filter id="sat-glow" x="-20%" y="-20%" width="150%" height="160%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#FF5722" flood-opacity="0.5" />
+                  </filter>
+
+                  <pattern id="satellite-grid-pat" width="28" height="28" patternUnits="userSpaceOnUse">
+                    <path d="M 28 0 L 0 0 0 28" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.7" />
+                  </pattern>
                 </defs>
-                <rect width="560" height="420" fill="#EAE7E0" />
-                <rect width="560" height="420" fill="url(#street-grid)" />
 
-                <!-- 3D Isometric Buildings Layer -->
-                <g id="map-3d-buildings" opacity="0.95">
-                  <!-- Block 1 (Top Left) -->
-                  <polygon points="65,115 125,115 140,128 80,128" class="map-3d-bldg-shadow" />
-                  <polygon points="65,75 110,75 110,115 65,115" class="map-3d-bldg-front" />
-                  <polygon points="110,75 125,60 125,100 110,115" class="map-3d-bldg-side" />
-                  <polygon points="65,75 80,60 125,60 110,75" class="map-3d-bldg-top" />
+                <!-- Layer 1: Multi-Zone Satellite Ortho Terrain Base -->
+                <rect width="560" height="420" fill="#141C24" />
+                
+                <!-- Patchwork Agricultural & Urban District Plots -->
+                <rect x="0" y="0" width="160" height="150" fill="#203324" opacity="0.9" />
+                <polygon points="0,0 160,0 120,70 0,60" fill="#2A422F" opacity="0.8" />
+                <polygon points="120,0 260,0 230,80 140,75" fill="#3B3828" opacity="0.75" />
+                <polygon points="260,0 420,0 390,95 240,80" fill="#253A2A" opacity="0.85" />
+                <polygon points="420,0 560,0 560,110 390,95" fill="#3E3426" opacity="0.8" />
+                
+                <!-- Mid & Lower Terrain Parcels -->
+                <polygon points="0,170 230,170 230,310 0,310" fill="#1B2430" />
+                <polygon points="250,170 420,170 420,310 250,310" fill="#212C3A" />
+                <polygon points="440,170 560,170 560,310 440,310" fill="#28352A" />
+                <polygon points="0,330 230,330 230,420 0,420" fill="#2C382A" />
+                <polygon points="250,330 420,330 420,420 250,420" fill="#3A3327" />
+                <polygon points="440,330 560,330 560,420 440,420" fill="#1D2633" />
+                
+                <rect width="560" height="420" fill="url(#satellite-grid-pat)" />
 
-                  <polygon points="145,55 185,55 185,115 145,115" class="map-3d-bldg-front" />
-                  <polygon points="185,55 198,42 198,102 185,115" class="map-3d-bldg-side" />
-                  <polygon points="145,55 158,42 198,42 185,55" class="map-3d-bldg-top" />
-
-                  <!-- Block 2 (Top Center) -->
-                  <polygon points="280,120 335,120 350,132 295,132" class="map-3d-bldg-shadow" />
-                  <polygon points="280,70 330,70 330,120 280,120" class="map-3d-bldg-front" />
-                  <polygon points="330,70 345,55 345,105 330,120" class="map-3d-bldg-side" />
-                  <polygon points="280,70 295,55 345,55 330,70" class="map-3d-bldg-top" />
-
-                  <!-- Block 3 (Bottom Left) -->
-                  <polygon points="60,280 115,280 128,292 73,292" class="map-3d-bldg-shadow" />
-                  <polygon points="60,235 110,235 110,280 60,280" class="map-3d-bldg-front" />
-                  <polygon points="110,235 124,220 124,265 110,280" class="map-3d-bldg-side" />
-                  <polygon points="60,235 74,220 124,220 110,235" class="map-3d-bldg-top" />
-
-                  <!-- Block 4 (Bottom Right) -->
-                  <polygon points="290,285 345,285 358,296 303,296" class="map-3d-bldg-shadow" />
-                  <polygon points="290,240 340,240 340,285 290,285" class="map-3d-bldg-front" />
-                  <polygon points="340,240 354,226 354,271 340,285" class="map-3d-bldg-side" />
-                  <polygon points="290,240 304,226 354,226 340,240" class="map-3d-bldg-top" />
+                <!-- Layer 2: Sports Turf Stadium (Vibrant Emerald with Field Markings) -->
+                <g id="sat-stadium" transform="translate(18, 14)">
+                  <polygon points="0,0 90,0 96,6 96,56 90,62 0,62 -6,56 -6,6" fill="#1E293B" stroke="#334155" stroke-width="1.5" />
+                  <rect x="2" y="4" width="86" height="54" rx="4" fill="#15803D" />
+                  <rect x="7" y="9" width="76" height="44" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.85" />
+                  <line x1="45" y1="9" x2="45" y2="53" stroke="#FFFFFF" stroke-width="1" opacity="0.85" />
+                  <circle cx="45" cy="31" r="9" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.85" />
+                  <rect x="7" y="21" width="10" height="20" fill="none" stroke="#FFFFFF" stroke-width="0.8" opacity="0.85" />
+                  <rect x="73" y="21" width="10" height="20" fill="none" stroke="#FFFFFF" stroke-width="0.8" opacity="0.85" />
                 </g>
 
+                <!-- Layer 3: Winding Satellite River Canal with Sandbanks & Marina -->
+                <path d="M -20 85 Q 140 140 240 85 T 440 60 T 580 95" fill="none" stroke="#D4A373" stroke-width="44" stroke-linecap="round" opacity="0.5" />
+                <path d="M -20 85 Q 140 140 240 85 T 440 60 T 580 95" fill="none" stroke="url(#sat-river-grad)" stroke-width="36" stroke-linecap="round" />
+                <path d="M -20 85 Q 140 140 240 85 T 440 60 T 580 95" fill="none" stroke="#E0F2FE" stroke-width="2.5" stroke-dasharray="28 22" opacity="0.65" />
+                <g id="sat-marina" opacity="0.85">
+                  <line x1="220" y1="98" x2="220" y2="114" stroke="#64748B" stroke-width="3" />
+                  <rect x="216" y="112" width="8" height="3" rx="1" fill="#FFFFFF" />
+                  <line x1="234" y1="94" x2="234" y2="110" stroke="#64748B" stroke-width="3" />
+                  <rect x="230" y="108" width="8" height="3" rx="1" fill="#38BDF8" />
+                  <line x1="365" y1="52" x2="365" y2="68" stroke="#64748B" stroke-width="3" />
+                  <rect x="361" y="66" width="8" height="3" rx="1" fill="#FFFFFF" />
+                </g>
+
+                <!-- Layer 4: Dense Urban Park Foliage & Tree Canopies -->
+                <g id="sat-parks">
+                  <path d="M 35 185 Q 95 168 145 208 Q 155 285 85 295 Q 25 275 35 185 Z" fill="#14532D" stroke="#166534" stroke-width="1.5" />
+                  <path d="M 50 200 Q 100 190 125 220 Q 130 270 75 278 Z" fill="#166534" />
+                  <circle cx="65" cy="225" r="11" fill="#22C55E" opacity="0.85" />
+                  <circle cx="98" cy="218" r="15" fill="#15803D" opacity="0.9" />
+                  <circle cx="82" cy="250" r="13" fill="#4ADE80" opacity="0.75" />
+                  <circle cx="118" cy="250" r="12" fill="#166534" opacity="0.9" />
+                  <circle cx="55" cy="260" r="10" fill="#65A30D" opacity="0.85" />
+                  <path d="M 45 210 Q 80 235 100 230 T 135 255" fill="none" stroke="#E2E8F0" stroke-width="2" stroke-linecap="round" opacity="0.5" />
+
+                  <polygon points="285,18 425,18 415,105 295,105" fill="#14532D" stroke="#166534" stroke-width="1" />
+                  <circle cx="320" cy="45" r="13" fill="#15803D" opacity="0.85" />
+                  <circle cx="355" cy="38" r="16" fill="#22C55E" opacity="0.85" />
+                  <circle cx="385" cy="55" r="14" fill="#4ADE80" opacity="0.75" />
+                  <circle cx="340" cy="72" r="12" fill="#65A30D" opacity="0.85" />
+                  <circle cx="380" cy="85" r="11" fill="#15803D" opacity="0.9" />
+                </g>
+
+                <!-- Layer 5: Highway System & Multi-Lane Arterials -->
                 <g id="map-grid-layer">
-                  <path class="map-road" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" />
-                  <path class="map-road-center" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" />
+                  <path d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" stroke="#0F172A" stroke-width="18" stroke-linecap="square" />
+                  <path class="map-road" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" stroke="#1E242E" stroke-width="14" stroke-linecap="square" />
+                  <path class="map-road-center" d="M -20 160 L 580 160 M 240 -20 L 240 440 M -20 320 L 580 320 M 430 -20 L 430 440" stroke="#F59E0B" stroke-width="1.4" stroke-dasharray="6 5" />
+                  
+                  <!-- River Highway Bridge Piers & Shadow -->
+                  <rect x="230" y="70" width="20" height="30" fill="#0A0E17" opacity="0.5" />
+                  <rect x="232" y="72" width="16" height="26" fill="#334155" stroke="#64748B" stroke-width="1" />
+                  <line x1="232" y1="72" x2="232" y2="98" stroke="#94A3B8" stroke-width="1.5" />
+                  <line x1="248" y1="72" x2="248" y2="98" stroke="#94A3B8" stroke-width="1.5" />
+
+                  <!-- Pedestrian Crosswalks -->
+                  <g stroke="#FFFFFF" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.8">
+                    <line x1="218" y1="154" x2="218" y2="166" />
+                    <line x1="262" y1="154" x2="262" y2="166" />
+                    <line x1="234" y1="140" x2="246" y2="140" />
+                    <line x1="234" y1="180" x2="246" y2="180" />
+                    <line x1="218" y1="314" x2="218" y2="326" />
+                    <line x1="262" y1="314" x2="262" y2="326" />
+                    <line x1="234" y1="300" x2="246" y2="300" />
+                    <line x1="234" y1="340" x2="246" y2="340" />
+                    <line x1="408" y1="154" x2="408" y2="166" />
+                    <line x1="452" y1="154" x2="452" y2="166" />
+                  </g>
+
+                  <!-- Small Ambient City Traffic -->
+                  <rect x="180" y="156" width="7" height="4" rx="1" fill="#FFFFFF" />
+                  <rect x="290" y="161" width="8" height="4" rx="1" fill="#38BDF8" />
+                  <rect x="237" y="210" width="4" height="8" rx="1" fill="#EF4444" />
+                  <rect x="242" y="270" width="4" height="7" rx="1" fill="#FEF08A" />
+                  <rect x="427" y="230" width="4" height="8" rx="1" fill="#FFFFFF" />
+                  <rect x="480" y="316" width="7" height="4" rx="1" fill="#10B981" />
                 </g>
 
-                <path id="map-route-line" class="map-route-line" d="M 120 320 L 240 320 L 240 160 L 430 160" filter="url(#map-3d-shadow)" stroke="url(#route-3d-grad)" />
+                <!-- Layer 6: 3D Isometric Satellite Architecture -->
+                <g id="map-3d-buildings">
+                  <!-- Building 1: Skyscraper Glass Tower with Helipad -->
+                  <polygon points="145,115 185,115 220,150 180,150" class="sat-shadow-45" />
+                  <polygon points="145,45 185,45 185,115 145,115" class="sat-bldg-glass-front" />
+                  <polygon points="185,45 200,30 200,100 185,115" class="sat-bldg-glass-side" />
+                  <polygon points="145,45 160,30 200,30 185,45" class="sat-bldg-glass-top" />
+                  <circle cx="172" cy="38" r="6.5" fill="none" stroke="#FBBF24" stroke-width="1.3" />
+                  <circle cx="172" cy="38" r="5" fill="none" stroke="#FFFFFF" stroke-width="0.7" stroke-dasharray="2 1" />
+                  <text x="172" y="41" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="6.5" fill="#FBBF24">H</text>
 
-                <!-- Elevated 3D Shelter Compound -->
+                  <!-- Building 2: Commercial Solar Complex -->
+                  <polygon points="280,118 330,118 360,148 310,148" class="sat-shadow-45" />
+                  <polygon points="280,68 330,68 330,118 280,118" class="sat-bldg-comm-front" />
+                  <polygon points="330,68 348,50 348,100 330,118" class="sat-bldg-comm-side" />
+                  <polygon points="280,68 298,50 348,50 330,68" class="sat-bldg-comm-top" />
+                  <polygon points="287,63 301,49 339,49 325,63" fill="url(#sat-solar-grad)" stroke="#38BDF8" stroke-width="0.8" />
+                  <line x1="294" y1="56" x2="332" y2="56" stroke="#38BDF8" stroke-width="0.6" stroke-dasharray="2 2" />
+                  <rect x="290" y="58" width="8" height="4" fill="#94A3B8" rx="0.5" />
+
+                  <!-- Building 3: Civic Center & Plaza with Fountain -->
+                  <polygon points="285,280 345,280 375,310 315,310" class="sat-shadow-45" />
+                  <polygon points="285,235 345,235 345,280 285,280" fill="#134E4A" stroke="#2DD4BF" stroke-width="0.8" />
+                  <polygon points="345,235 362,218 362,263 345,280" fill="#042F2E" stroke="#115E59" stroke-width="0.8" />
+                  <polygon points="285,235 302,218 362,218 345,235" fill="#0D9488" stroke="#5EEAD4" stroke-width="1.2" />
+                  <polygon points="280,282 350,282 355,302 275,302" fill="#334155" opacity="0.6" />
+                  <circle cx="315" cy="292" r="5" fill="#06B6D4" stroke="#A5F3FC" stroke-width="0.8" />
+                  <circle cx="315" cy="292" r="2" fill="#FFFFFF" />
+
+                  <!-- Building 4: Residential Terracotta Tile Quads -->
+                  <polygon points="375,275 410,275 425,290 390,290" class="sat-shadow-45" />
+                  <polygon points="375,245 410,245 410,275 375,275" fill="#9A3412" stroke="#EA580C" stroke-width="0.8" />
+                  <polygon points="410,245 420,235 420,265 410,275" fill="#431407" stroke="#7C2D12" stroke-width="0.8" />
+                  <polygon points="375,245 392,230 420,235 410,245" fill="#EA580C" stroke="#FDBA74" stroke-width="1" />
+                  <polygon points="435,275 470,275 485,290 450,290" class="sat-shadow-45" />
+                  <polygon points="435,245 470,245 470,275 435,275" fill="#9A3412" stroke="#EA580C" stroke-width="0.8" />
+                  <polygon points="470,245 480,235 480,265 470,275" fill="#431407" stroke="#7C2D12" stroke-width="0.8" />
+                  <polygon points="435,245 452,230 480,235 470,245" fill="#C2410C" stroke="#FDBA74" stroke-width="1" />
+
+                  <!-- Building 5: Shree Kitchen (Donor Hub) Facility Complex -->
+                  <polygon points="60,280 115,280 135,300 80,300" class="sat-shadow-45" />
+                  <polygon points="60,235 110,235 110,280 60,280" class="sat-bldg-donor-front" />
+                  <polygon points="110,235 125,220 125,265 110,280" class="sat-bldg-donor-side" />
+                  <polygon points="60,235 75,220 125,220 110,235" class="sat-bldg-donor-top" />
+                  <rect x="75" y="224" width="12" height="6" fill="#7C2D12" rx="1" />
+                  <circle cx="100" cy="227" r="3" fill="#FED7AA" stroke="#EA580C" stroke-width="0.7" />
+                  <rect x="70" y="270" width="18" height="10" fill="#1E293B" rx="1" />
+                  <rect x="73" y="272" width="12" height="6" fill="#F97316" rx="0.5" />
+                </g>
+
+                <!-- Layer 7: 3D Neon Active Delivery Corridor Vector -->
+                <path id="map-route-line" class="map-route-line" d="M 120 320 L 240 320 L 240 160 L 430 160" filter="url(#sat-glow)" stroke="url(#route-neon-grad)" stroke-width="5" />
+
+                <!-- Layer 8: Asha Shelter Receiving Compound -->
                 <g transform="translate(430, 160)">
-                  <circle r="26" class="map-shelter-pulse" />
-                  <ellipse cx="0" cy="10" rx="20" ry="8" fill="rgba(30,27,24,0.28)" />
-                  <polygon points="-14,-4 14,-4 14,8 -14,8" fill="#1E1B18" stroke="#FAF6EF" stroke-width="1.2" />
-                  <polygon points="-14,-4 0,-16 14,-4" fill="#C2571A" stroke="#FAF6EF" stroke-width="1.2" />
-                  <polygon points="14,-4 22,-11 22,1 14,8" fill="#9C4412" />
-                  <rect x="-4" y="0" width="8" height="8" fill="#FAF6EF" rx="1" />
-                  <rect x="-44" y="24" width="88" height="20" rx="5" fill="var(--ink)" />
-                  <text y="38" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="10" fill="#FAF6EF">Asha Shelter</text>
+                  <circle r="34" class="map-shelter-pulse" stroke="#10B981" />
+                  <ellipse cx="0" cy="14" rx="26" ry="10" fill="rgba(10,16,26,0.65)" />
+                  <polygon points="-18,-6 18,-6 18,10 -18,10" class="sat-bldg-shelter-front" />
+                  <polygon points="18,-6 28,-16 28,0 18,10" class="sat-bldg-shelter-side" />
+                  <polygon points="-18,-6 0,-20 18,-6" class="sat-bldg-shelter-top" />
+                  <rect x="-5" y="0" width="10" height="10" fill="#FEF08A" rx="1" />
+                  <rect x="-50" y="26" width="100" height="22" rx="6" fill="#0F172A" stroke="#10B981" stroke-width="1.5" />
+                  <circle cx="-38" cy="37" r="3.5" fill="#10B981" />
+                  <text x="3" y="41" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="11" fill="#4ADE80">Asha Shelter</text>
                 </g>
 
+                <!-- Layer 9: 3D Elevated Pin for Donation Facility -->
                 <g id="map-dynamic-pin">
                   <g class="map-donor-pin">
-                    <ellipse cx="120" cy="324" rx="8" ry="3.5" fill="rgba(30,27,24,0.3)"/>
-                    <line x1="120" y1="320" x2="120" y2="306" stroke="#C2571A" stroke-width="2.5" stroke-linecap="round"/>
-                    <circle cx="120" cy="306" r="9" fill="#C2571A" stroke="#FAF6EF" stroke-width="2.5" />
-                    <circle cx="120" cy="306" r="3" fill="#FAF6EF" />
-                    <rect x="88" y="272" width="64" height="17" rx="4" fill="var(--ink)"/>
-                    <text x="120" y="284" text-anchor="middle" font-family="var(--fb)" font-weight="700" font-size="10" fill="#FAF6EF">Donation</text>
+                    <ellipse cx="120" cy="326" rx="10" ry="4.5" fill="rgba(10,16,26,0.7)"/>
+                    <line x1="120" y1="320" x2="120" y2="302" stroke="#FF5722" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="120" cy="302" r="10" fill="#FF5722" stroke="#FFFFFF" stroke-width="2.5" />
+                    <circle cx="120" cy="302" r="3.5" fill="#FFFFFF" />
+                    <rect x="82" y="266" width="76" height="20" rx="5" fill="#0F172A" stroke="#FF5722" stroke-width="1.5"/>
+                    <circle cx="92" cy="276" r="3.5" fill="#FF5722" />
+                    <text x="124" y="280" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="10.5" fill="#FFA56E">Donation</text>
                   </g>
                 </g>
 
-                <!-- Elevated 3D Courier Icon with Ground Shadow -->
+                <!-- Layer 10: 3D Elevated Courier Scooter with Headlight & Shadow -->
                 <g id="map-truck" class="map-truck-icon" transform="translate(108, 308)">
-                  <ellipse cx="12" cy="18" rx="14" ry="4" fill="rgba(30,27,24,0.32)" />
-                  <rect width="24" height="14" rx="3" fill="#C2571A" />
-                  <circle cx="6" cy="14" r="3.5" fill="#1E1B18" />
-                  <circle cx="18" cy="14" r="3.5" fill="#1E1B18" />
-                  <rect x="14" y="2" width="7" height="6" rx="1" fill="#FAF6EF" />
+                  <ellipse cx="12" cy="20" rx="16" ry="5" fill="rgba(10,16,26,0.7)" />
+                  <rect width="24" height="15" rx="3.5" fill="#C2571A" stroke="#FFA56E" stroke-width="1.2" />
+                  <circle cx="6" cy="15" r="3.5" fill="#0F172A" stroke="#94A3B8" stroke-width="0.9" />
+                  <circle cx="18" cy="15" r="3.5" fill="#0F172A" stroke="#94A3B8" stroke-width="0.9" />
+                  <rect x="14" y="2" width="7" height="6" rx="1" fill="#FEF08A" />
+                  <polygon points="24,3 40,0 40,12 24,8" fill="#FEF08A" opacity="0.4" />
                 </g>
 
                 <g id="map-check" class="map-check-icon" transform="translate(416, 146)" opacity="0">
-                  <ellipse cx="14" cy="26" rx="12" ry="4" fill="rgba(30,27,24,0.3)" />
-                  <circle cx="14" cy="14" r="14" fill="#2F7A52" />
+                  <ellipse cx="14" cy="27" rx="15" ry="5.5" fill="rgba(10,16,26,0.7)" />
+                  <circle cx="14" cy="14" r="15" fill="#059669" stroke="#34D399" stroke-width="2" />
                   <path d="M 8 14 L 12 18 L 20 10" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
                 </g>
+
+                <!-- Layer 11: High-Tech Satellite Telemetry & HUD Overlay -->
+                <!-- North Compass Rose in Top Right -->
+                <g transform="translate(530, 28)" opacity="0.85">
+                  <circle r="14" fill="#0F172A" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+                  <polygon points="0,-10 -4,0 0,-2 4,0" fill="#FF5722" />
+                  <polygon points="0,10 -4,0 0,2 4,0" fill="#94A3B8" />
+                  <text y="-3" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="7" fill="#FFFFFF">N</text>
+                </g>
+
+                <!-- Sensor Telemetry Bar at Bottom -->
+                <g transform="translate(18, 404)">
+                  <rect x="-6" y="-12" width="370" height="18" rx="4" fill="rgba(15,23,42,0.85)" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" />
+                  <circle cx="2" cy="-3" r="2.5" fill="#10B981" />
+                  <text x="12" y="0" font-family="monospace" font-size="9" font-weight="600" fill="#38BDF8" letter-spacing="0.5">18°31'49"N 73°51'11"E &bull; SATELLITE 3D EO-OPTICAL &bull; 0.15M/PX</text>
+                </g>
+
+                <!-- Scale Bar in Bottom Right -->
+                <g transform="translate(460, 404)">
+                  <rect x="-8" y="-12" width="90" height="18" rx="4" fill="rgba(15,23,42,0.85)" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" />
+                  <line x1="0" y1="-3" x2="40" y2="-3" stroke="#FFFFFF" stroke-width="1.8" />
+                  <line x1="0" y1="-7" x2="0" y2="1" stroke="#FFFFFF" stroke-width="1.8" />
+                  <line x1="40" y1="-7" x2="40" y2="1" stroke="#FFFFFF" stroke-width="1.8" />
+                  <text x="48" y="0" font-family="monospace" font-size="8.5" font-weight="700" fill="#FFFFFF">250m</text>
+                </g>
               </svg>
-              <div id="map-instruction" class="map-instruction-tag">Click anywhere on the 3D grid to test a dispatch</div>
+              <div id="map-instruction" class="map-instruction-tag">Click anywhere on the satellite grid to test live dispatch</div>
             </div>
           </div>
         </div>
@@ -561,21 +751,161 @@ function sortFilter(items) {
 
 const controls = () => `<div class="row" style="margin:14px 0 10px;gap:18px"><label>Sort<select data-flt="sort">${['distance', 'urgency', 'quantity', 'compatibility'].map(x => `<option ${flt.sort === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label><label>Category<select data-flt="cat"><option value="">All Categories</option>${S.cats.map(x => `<option ${flt.cat === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label><label style="grid-auto-flow:column;align-items:center;font-weight:700"><input type="checkbox" data-flt="ok" ${flt.ok ? 'checked' : ''}> Compatible only</label></div>`;
 
+let routeMapCounter = 0;
+function routeMap3D(fromName, toName, km, mins, ok) {
+  const uid = ++routeMapCounter;
+  const dist = km != null ? km : '2.4';
+  const duration = mins != null ? mins : (Math.round(parseFloat(dist) * 3.5) || '8');
+  return `
+    <div class="route-3d-stage">
+      <div class="route-3d-box">
+        <div class="route-3d-header">
+          <span>3D SATELLITE DISPATCH CORRIDOR</span>
+          <span class="route-3d-badge">Live Courier Path</span>
+        </div>
+        <svg class="route-3d-svg" viewBox="0 0 460 210">
+          <defs>
+            <linearGradient id="route-path-grad-${uid}" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#FF5722" />
+              <stop offset="50%" stop-color="#F59E0B" />
+              <stop offset="100%" stop-color="#10B981" />
+            </linearGradient>
+            <filter id="route-line-glow-${uid}" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#FF5722" flood-opacity="0.6" />
+            </filter>
+            <pattern id="route-grid-pat-${uid}" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.6" />
+            </pattern>
+          </defs>
+
+          <!-- Satellite Ground Plane -->
+          <rect width="460" height="210" fill="#0B1320" />
+          <rect width="460" height="210" fill="url(#route-grid-pat-${uid})" />
+
+          <!-- Urban Green Zones -->
+          <path d="M 10 10 Q 70 20 60 70 Q 20 80 10 10 Z" fill="#14532D" opacity="0.6" />
+          <circle cx="35" cy="40" r="12" fill="#166534" opacity="0.8" />
+          <circle cx="50" cy="50" r="10" fill="#22C55E" opacity="0.7" />
+
+          <path d="M 230 130 Q 300 120 310 180 Q 240 190 230 130 Z" fill="#14532D" opacity="0.6" />
+          <circle cx="265" cy="155" r="14" fill="#15803D" opacity="0.8" />
+          <circle cx="285" cy="165" r="11" fill="#4ADE80" opacity="0.7" />
+
+          <!-- Asphalt Roadways -->
+          <g stroke="#1E293B" stroke-width="12" stroke-linecap="round">
+            <path d="M 20 120 L 440 120" />
+            <path d="M 120 20 L 120 190" />
+            <path d="M 330 20 L 330 190" />
+            <path d="M 20 50 L 440 50" />
+          </g>
+          <g stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.65">
+            <path d="M 20 120 L 440 120" />
+            <path d="M 120 20 L 120 190" />
+            <path d="M 330 20 L 330 190" />
+            <path d="M 20 50 L 440 50" />
+          </g>
+
+          <!-- 3D City Buildings -->
+          <polygon points="50,110 90,110 105,125 65,125" fill="rgba(0,0,0,0.5)" />
+          <polygon points="50,80 90,80 90,110 50,110" fill="#1E293B" stroke="#334155" stroke-width="0.8" />
+          <polygon points="90,80 100,70 100,100 90,110" fill="#0F172A" />
+          <polygon points="50,80 60,70 100,70 90,80" fill="#334155" stroke="#475569" stroke-width="0.8" />
+
+          <polygon points="170,110 220,110 238,128 188,128" fill="rgba(0,0,0,0.5)" />
+          <polygon points="170,65 220,65 220,110 170,110" fill="#1E3A8A" stroke="#38BDF8" stroke-width="0.8" />
+          <polygon points="220,65 232,53 232,98 220,110" fill="#0F172A" />
+          <polygon points="170,65 182,53 232,53 220,65" fill="#2563EB" stroke="#60A5FA" stroke-width="0.8" />
+          <circle cx="206" cy="59" r="4" fill="none" stroke="#FBBF24" stroke-width="1" />
+
+          <polygon points="360,110 400,110 415,125 375,125" fill="rgba(0,0,0,0.5)" />
+          <polygon points="360,82 400,82 400,110 360,110" fill="#1E293B" stroke="#334155" stroke-width="0.8" />
+          <polygon points="400,82 410,72 410,100 400,110" fill="#0F172A" />
+          <polygon points="360,82 370,72 410,72 400,82" fill="#334155" />
+
+          <!-- Dispatch Route Path -->
+          <path id="transit-route-track-${uid}" d="M 70 120 L 120 120 L 120 50 L 330 50 L 330 120 L 390 120" fill="none" stroke="url(#route-path-grad-${uid})" stroke-width="4.5" filter="url(#route-line-glow-${uid})" stroke-linecap="round" stroke-linejoin="round" />
+
+          <!-- Donor Pin (Origin) -->
+          <g transform="translate(70, 120)">
+            <ellipse cx="0" cy="8" rx="10" ry="4" fill="rgba(0,0,0,0.6)" />
+            <circle r="16" fill="none" stroke="#FF5722" stroke-width="1.2" opacity="0.7">
+              <animate attributeName="r" values="8;22" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.9;0" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <circle r="7" fill="#FF5722" stroke="#FFFFFF" stroke-width="2" />
+            <rect x="-42" y="-28" width="84" height="18" rx="4" fill="#0F172A" stroke="#FF5722" stroke-width="1" />
+            <text y="-16" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="8.5" fill="#FFA56E">PICKUP: ${esc(fromName).slice(0, 13)}</text>
+          </g>
+
+          <!-- Receiver Pin (Destination) -->
+          <g transform="translate(390, 120)">
+            <ellipse cx="0" cy="8" rx="10" ry="4" fill="rgba(0,0,0,0.6)" />
+            <circle r="16" fill="none" stroke="#10B981" stroke-width="1.2" opacity="0.7">
+              <animate attributeName="r" values="8;22" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.9;0" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <circle r="7" fill="#10B981" stroke="#FFFFFF" stroke-width="2" />
+            <rect x="-44" y="-28" width="88" height="18" rx="4" fill="#0F172A" stroke="#10B981" stroke-width="1" />
+            <text y="-16" text-anchor="middle" font-family="var(--fb)" font-weight="800" font-size="8.5" fill="#4ADE80">DROP-OFF: ${esc(toName).slice(0, 13)}</text>
+          </g>
+
+          <!-- Animated Rider Scooter Following Path via SVG animateMotion -->
+          <g>
+            <animateMotion dur="4.5s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#transit-route-track-${uid}" />
+            </animateMotion>
+            <ellipse cx="0" cy="5" rx="7" ry="2.5" fill="rgba(0,0,0,0.7)" />
+            <rect x="-7" y="-5" width="14" height="10" rx="2.5" fill="#C2571A" stroke="#FFA56E" stroke-width="1" />
+            <circle cx="-3" cy="5" r="2.5" fill="#0F172A" stroke="#94A3B8" stroke-width="0.7" />
+            <circle cx="3" cy="5" r="2.5" fill="#0F172A" stroke="#94A3B8" stroke-width="0.7" />
+            <polygon points="7,-2 14,-5 14,3 7,1" fill="#FEF08A" opacity="0.6" />
+          </g>
+
+          <!-- Telemetry Footer Overlay -->
+          <text x="14" y="198" font-family="monospace" font-size="8.5" fill="rgba(255,255,255,0.45)" letter-spacing="0.5">EST. TRANSIT: ~${duration} MIN &bull; ACTIVE CORRIDOR VECTOR &bull; DISPATCH READY</text>
+        </svg>
+        <div class="route-metric-pill-row" style="padding:0 14px">
+          <div class="route-metric-pill"><span>Direct Distance:</span> <b class="accent" style="color:var(--orange)">${dist} km</b></div>
+          <div class="route-metric-pill"><span>Rider Transit:</span> <b class="accent" style="color:#0284C7">~${duration} min</b></div>
+          <div class="route-metric-pill"><span>Safety Clearance:</span> <b class="accent" style="color:#10B981">${ok ? 'Feasible' : 'Tight Buffer'}</b></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function emergency() {
   const me = S.me;
-  if (me.role === 'receiver') {
+  if (me.role === 'receiver' || me.role === 'rider' || me.role === 'admin') {
+    const receiverId = me.role === 'receiver' ? me.id : (S.users.find(u => u.role === 'receiver')?.id || 'u6');
+    const receiverObj = usr(receiverId) || { name: 'Asha Shelter', needs: { 'Cooked meals': 40 } };
     const items = S.donations.filter(d => d.status === 'Available').map(d => {
-      const f = S.fits[d.id + ':' + me.id] || {}, dn = usr(d.donorId);
-      return { id: d.id, name: dn.name, km: f.km, qty: d.remaining, unit: d.unit, cat: d.category, exp: d.expiresAt, mins: f.mins, safety: d.safety, ok: f.ok, why: f.why || [], need: Math.min(d.remaining, (me.needs || {})[d.category] || 0), cls: f.ok ? (d.expiresAt - T() < 72e5 ? 'amber' : 'green') : 'bad' };
+      const f = S.fits[d.id + ':' + receiverId] || {}, dn = usr(d.donorId) || { name: 'Donor Kitchen' };
+      return { 
+        id: d.id, 
+        name: dn.name, 
+        km: f.km || 2.4, 
+        qty: d.remaining, 
+        unit: d.unit, 
+        cat: d.category, 
+        exp: d.expiresAt, 
+        mins: f.mins || 8, 
+        safety: d.safety || [], 
+        ok: f.ok != null ? f.ok : true, 
+        why: f.why || [], 
+        need: Math.min(d.remaining, (receiverObj.needs || {})[d.category] || 30), 
+        cls: (f.ok !== false) ? (d.expiresAt - T() < 72e5 ? 'amber' : 'green') : 'bad' 
+      };
     });
-    const list = sortFilter(items), cur = list.find(i => i.id === sel);
+    const list = sortFilter(items);
+    const cur = list.find(i => i.id === sel) || list[0];
 
     return `
       <div class="radar-command-deck">
         <div class="radar-hud-bar">
           <div>
             <span style="font-size:0.75rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange)">Live Corridor Telemetry</span>
-            <div style="font-family:var(--fd);font-weight:700;font-size:1.25rem">${esc(me.name)} &bull; Nearby Donors Radar</div>
+            <div style="font-family:var(--fd);font-weight:700;font-size:1.25rem">${esc(receiverObj.name)} &bull; Nearby Donors Radar</div>
           </div>
           <div class="radar-hud-pills">
             <span class="radar-hud-pill active">&bull; 360&deg; Live Radar Active</span>
@@ -589,7 +919,7 @@ function emergency() {
         ${legendHtml}
 
         <div class="ringwrap">
-          ${list.length ? ring(list, me.name) : '<div class="card"><p class="mut">No donors match these filters in the immediate corridor.</p></div>'}
+          ${list.length ? ring(list, receiverObj.name) : '<div class="card"><p class="mut">No donors match these filters in the immediate corridor.</p></div>'}
           <div>
             ${cur ? detailR(cur) : `
               <div class="radar-inspect-hud">
@@ -610,7 +940,7 @@ function emergency() {
           <table>
             <caption class="mut" style="text-align:left;margin-bottom:8px">Live sensor feeds aligned with radar targets. Click Inspect on any row to lock on.</caption>
             <thead><tr><th>Donor Facility</th><th>Distance</th><th>Batch Surplus</th><th>Category</th><th>Expires in</th><th>Transit Est.</th><th>Safety Specs</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody>${list.map(i => `<tr><td><b>${esc(i.name)}</b></td><td>${i.km} km</td><td><b>${i.qty}</b> ${esc(i.unit)}</td><td>${esc(i.cat)}</td><td>${timer(i.exp)}</td><td>${i.mins} min</td><td>${esc(i.safety.join(', ') || 'Standard')}</td><td>${i.ok ? chip('Compatible') : chip('Blocked')}${i.ok ? '' : `<br><small class="mut">${esc(i.why.join('; '))}</small>`}</td><td><button class="btn s ${sel === i.id ? 'p' : ''}" data-sel="${i.id}">Inspect</button></td></tr>`).join('')}</tbody>
+            <tbody>${list.map(i => `<tr><td><b>${esc(i.name)}</b></td><td>${i.km} km</td><td><b>${i.qty}</b> ${esc(i.unit)}</td><td>${esc(i.cat)}</td><td>${timer(i.exp)}</td><td>${i.mins} min</td><td>${esc(i.safety.join(', ') || 'Standard')}</td><td>${i.ok ? chip('Compatible') : chip('Blocked')}${i.ok ? '' : `<br><small class="mut">${esc(i.why.join('; '))}</small>`}</td><td><button class="btn s ${cur && cur.id === i.id ? 'p' : ''}" data-sel="${i.id}">Inspect</button></td></tr>`).join('')}</tbody>
           </table>
         </div>
       </div>
@@ -618,13 +948,13 @@ function emergency() {
   }
 
   const mine = S.donations.filter(d => d.donorId === me.id && d.status === 'Available');
-  if (!mine.length) return `<div class="radar-command-deck"><h1 style="font-size:2.2rem">Emergency: Nearby Receivers</h1><div class="card"><p>Post an available donation first, then inspect which receiving shelters on the corridor have matching capacity and demand.</p></div></div>`;
-  const d = mine.find(x => x.id === sel2) || mine[0];
+  const d = mine.length ? (mine.find(x => x.id === sel2) || mine[0]) : (S.donations.find(x => x.status === 'Available') || S.donations[0] || { id: 'd1', category: 'Cooked meals', remaining: 45, unit: 'portions' });
   const items = S.users.filter(u => u.role === 'receiver').map(r => {
-    const f = S.fits[d.id + ':' + r.id] || {}, need = (r.needs || {})[d.category] || 0;
-    return { id: r.id, name: r.name, km: f.km, qty: need, cat: d.category, exp: d.expiresAt, ok: f.ok, why: f.why || [], r, cls: f.ok ? 'green' : 'bad', demand: Object.values(r.needs || {}).reduce((a, b) => a + b, 0) };
+    const f = S.fits[(d?.id || '') + ':' + r.id] || {}, need = (r.needs || {})[d?.category || 'Cooked meals'] || 0;
+    return { id: r.id, name: r.name, km: f.km || 2.4, qty: need, cat: d?.category || 'Cooked meals', exp: d?.expiresAt || (T() + 72e5), ok: f.ok != null ? f.ok : true, why: f.why || [], r, cls: (f.ok !== false) ? 'green' : 'bad', demand: Object.values(r.needs || {}).reduce((a, b) => a + b, 0) };
   });
-  const list = sortFilter(items), cur = list.find(i => i.id === sel);
+  const list = sortFilter(items);
+  const cur = list.find(i => i.id === sel) || list[0];
 
   return `
     <div class="radar-command-deck">
@@ -660,6 +990,7 @@ function emergency() {
                 <div class="radar-kpi-box"><div class="val">${cur.r.occupancy}/${cur.r.capacity}</div><div class="lbl">Occupancy</div></div>
               </div>
               <p style="margin:12px 0">${cur.ok ? chip('Compatible Match') : chip('Blocked: ' + cur.why.join('; '))}</p>
+              ${routeMap3D(S.me.name, cur.name, cur.km, Math.round(cur.km * 3.5), cur.ok)}
               <button class="btn p full" data-act="offer" data-id="${d.id}" data-to="${cur.id}" ${cur.ok ? '' : 'disabled'} style="font-size:1.02rem;padding:12px">Offer Batch to Shelter</button>
             </div>
           ` : `
@@ -698,6 +1029,7 @@ const detailR = i => `
     </div>
     <p style="margin:10px 0;font-size:0.88rem"><b>Safety:</b> ${esc(i.safety.join(', ') || 'Standard Packaging')}</p>
     <p style="margin:10px 0">${i.ok ? chip('Compatible') : chip('Blocked: ' + i.why.join('; '))}</p>
+    ${routeMap3D(i.name, S.me.name, i.km, i.mins, i.ok)}
     ${i.ok ? `
       <form class="f" data-form="request" data-id="${i.id}" style="grid-template-columns:1fr auto;align-items:end;margin-top:16px;gap:12px">
         <label><span>Request Portions (max ${i.need})</span><input name="qty" type="number" min="1" max="${i.need}" value="${i.need}" required></label>
@@ -960,8 +1292,23 @@ function profile() {
 }
 function shell(h) {
   const r = S.me.role, bell = S.notes.filter(n => n.level === 'urgent').length;
-  const nav = `<header class="top"><div class="wrap"><a class="logo" href="#/app">${BRAND}</a><a class="l" href="#/app">Dashboard</a>${r === 'receiver' ? `<a class="btn d s" href="#/app/emergency">${ic('alert')}Emergency Radar</a>` : r === 'donor' ? '<a class="l" href="#/app/emergency">Emergency Radar</a>' : ''}${r === 'admin' ? '<a class="l" href="#/app/lab">Simulation Lab</a>' : ''}${r !== 'admin' ? '<a class="l" href="#/app/profile">Profile</a>' : ''}<button class="l" data-act="sound" aria-pressed="${sound}">${sound ? 'Sound alerts on' : 'Enable sound alerts'}</button><span class="chip" title="Urgent notifications">${ic('bell')}${bell}</span><span class="mut" style="font-weight:700">${esc(S.me.name)}</span><button class="btn s" data-act="logout">Log out</button></div></header>`;
-  let body = h === 'app/emergency' && r !== 'rider' && r !== 'admin' ? emergency() : h === 'app/profile' && r !== 'admin' ? profile() : h === 'app/lab' && r === 'admin' ? lab() : { donor: donorView, receiver: receiverView, rider: riderView, admin: adminView }[r]();
+  const nav = `
+    <header class="top">
+      <div class="wrap">
+        <a class="logo" href="#/">${BRAND}</a>
+        <a class="l ${!h || h === '' ? 'active' : ''}" href="#/">Home</a>
+        <a class="l ${h === 'app' ? 'active' : ''}" href="#/app">Dashboard</a>
+        <a class="btn d s ${h === 'app/emergency' ? 'active' : ''}" href="#/app/emergency" style="gap:6px">${ic('alert')}Emergency Radar</a>
+        ${r === 'admin' ? `<a class="l ${h === 'app/lab' ? 'active' : ''}" href="#/app/lab">Simulation Lab</a>` : ''}
+        <a class="l ${h === 'app/profile' ? 'active' : ''}" href="#/app/profile">Profile</a>
+        <button class="l" data-act="sound" aria-pressed="${sound}">${sound ? 'Sound alerts on' : 'Enable sound alerts'}</button>
+        <span class="chip" title="Urgent notifications">${ic('bell')}${bell}</span>
+        <span class="mut" style="font-weight:700">${esc(S.me.name)}</span>
+        <button class="btn s" data-act="logout">Log out</button>
+      </div>
+    </header>
+  `;
+  let body = h === 'app/emergency' ? emergency() : h === 'app/profile' ? profile() : h === 'app/lab' && r === 'admin' ? lab() : { donor: donorView, receiver: receiverView, rider: riderView, admin: adminView }[r]();
   const title = { donor: 'Donor Dispatch Dashboard', receiver: 'Receiver Shelter Dashboard', rider: 'Courier Logistics Dashboard', admin: 'Platform Administration Console' }[r];
   return nav + `<main id="main" class="wrap pg">${h === 'app' ? `<h1 style="font-size:2.4rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:24px">${title}</h1>` : ''}${body}</main>`;
 }
@@ -969,8 +1316,24 @@ function render(force) {
   const a = document.activeElement;
   if (!force && a && a.closest && a.closest('#app') && /INPUT|SELECT|TEXTAREA/.test(a.tagName) && !a.dataset.flt) { dirty = true; return; }
   dirty = false; const h = location.hash.slice(2).split('?')[0]; let html;
-  if (h.startsWith('app')) { if (!TOK) { location.hash = '#/login'; return; } if (!S) return; html = shell(h); }
-  else if (h === 'login') html = loginPage(); else if (h.startsWith('register')) html = registerPage(h.split('/')[1] || 'donor'); else if (h === 'privacy' || h === 'terms') html = legal(h); else html = landing();
+  if (h.startsWith('app')) {
+    if (!TOK) {
+      if (h === 'app/emergency') {
+        ACT.demo({ e: 'receiver@demo.test' }).then(() => {
+          location.hash = '#/app/emergency';
+        });
+        return;
+      }
+      location.hash = '#/login';
+      return;
+    }
+    if (!S) return;
+    html = shell(h);
+  }
+  else if (h === 'login') html = loginPage(); 
+  else if (h.startsWith('register')) html = registerPage(h.split('/')[1] || 'donor'); 
+  else if (h === 'privacy' || h === 'terms') html = legal(h); 
+  else html = landing();
   const app = $('#app'); app.className = h !== lastH ? 'enter' : ''; lastH = h; app.innerHTML = html; countUp();
   if (!h || h === '/') {
     if (window.initLandingPage) setTimeout(() => window.initLandingPage(), 10);
@@ -996,16 +1359,28 @@ const ACT = {
   cancelDon: d => go(`/donations/${d.id}/cancel`), offer: async d => { await go(`/donations/${d.id}/offer`, { receiverId: d.to }); toast('Offer sent'); },
   ov: d => go('/admin/override', { action: d.a, id: d.id }), reset: async () => { await go('/admin/reset'); toast('Demo data reset'); },
   notifyDelay: async () => { const j = await api('/admin/sim', 'POST', { type: 'notifyDelay' }); toast(j.message); await refresh(); },
-  sound: () => { sound = !sound; if (sound) { aud = aud || new AudioContext(); siren(); } render(true); }, logout
+  sound: () => { sound = !sound; if (sound) { aud = aud || new AudioContext(); siren(); } render(true); },
+  logout: () => { TOK = null; localStorage.removeItem('tok'); location.hash = '#/'; }
 };
 document.addEventListener('click', async e => {
   const s = e.target.closest('[data-scroll]');
   if (s) {
-    if (window.completeStoryStage) window.completeStoryStage();
-    const el = document.getElementById(s.dataset.scroll);
+    const targetId = s.dataset.scroll;
+    const el = document.getElementById(targetId);
     if (el) {
+      if (window.completeStoryStage) window.completeStoryStage();
       if (window.lenisInstance) window.lenisInstance.scrollTo(el, { offset: -70 });
       else el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      location.hash = '#/';
+      setTimeout(() => {
+        if (window.completeStoryStage) window.completeStoryStage();
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+          if (window.lenisInstance) window.lenisInstance.scrollTo(targetEl, { offset: -70 });
+          else targetEl.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 150);
     }
     return;
   }
